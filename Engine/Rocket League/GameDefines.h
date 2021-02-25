@@ -594,11 +594,17 @@ public:
 	{
 		return (!wcscmp(ArrayData, other.ArrayData));
 	}
+
+	bool operator!=(const FString& other)
+	{
+		return (!wcscmp(ArrayData, other.ArrayData));
+	}
 };
 
 struct FScriptDelegate
 {
-	unsigned char UnknownData00[0x18];
+	UObject*			Object;									// 0x0000 (0x08)
+	uint8_t				UnknownData00[0x10];					// 0x0008 (0x10)
 };
 
 struct FPointer
@@ -734,9 +740,7 @@ public:
 	unsigned long		ArrayDim;								// 0x0070 (0x04)
 	unsigned long		ElementSize;							// 0x0074 (0x04)
 	int64_t				PropertyFlags;							// 0x0078 (0x08)
-	uint8_t				UnknownData[0x10];						// 0x0080 (0x10)
-	unsigned long		PropertySize;							// 0x0090 (0x04)
-	uint8_t				UnknownData00[0x4];						// 0x0094 (0x04)
+	uint8_t				UnknownData[0x18];						// 0x0080 (0x18)
 	unsigned long		Offset;									// 0x0098 (0x04)
 	uint8_t				UnknownData01[0x2C];					// 0x009C (0x30)
 public:

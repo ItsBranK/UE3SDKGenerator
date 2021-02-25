@@ -374,7 +374,8 @@ std::string FName_Struct =
 std::string FScriptDelegate_Struct =
 "struct FScriptDelegate\n"
 "{\n"
-"\tunsigned char UnknownData00[0x18];\n"
+"\tUObject*\t\t\tObject;\t\t\t\t\t\t\t\t\t// 0x0000 (0x08)\n"
+"\tuint8_t\t\t\t\tUnknownData00[0x10];\t\t\t\t\t// 0x0008 (0x10)\n"
 "};\n";
 
 std::string FPointer_Struct =
@@ -463,6 +464,11 @@ std::string FString_Struct =
 "\t{\n"
 "\t\treturn (!wcscmp(ArrayData, other.ArrayData));\n"
 "\t}\n"
+"\n"
+"\tbool operator!=(const FString& other)\n"
+"\t{\n"
+"\t\treturn (wcscmp(ArrayData, other.ArrayData));\n"
+"\t}\n"
 "};\n";
 
 std::string UField_Fields =
@@ -479,9 +485,7 @@ std::string UProperty_Fields =
 "\tunsigned long\t\tArrayDim;\t\t\t\t\t\t\t\t// 0x0070 (0x04) NOT AUTO-GENERATED PROPERTY\n"
 "\tunsigned long\t\tElementSize;\t\t\t\t\t\t\t// 0x0074 (0x04) NOT AUTO-GENERATED PROPERTY\n"
 "\tint64_t\t\t\t\tPropertyFlags;\t\t\t\t\t\t\t// 0x0078 (0x08) NOT AUTO-GENERATED PROPERTY\n"
-"\tuint8_t\t\t\t\tUnknownData[0x10];\t\t\t\t\t\t// 0x0080 (0x10) NOT AUTO-GENERATED PROPERTY\n"
-"\tunsigned long\t\tPropertySize;\t\t\t\t\t\t\t// 0x0090 (0x04) NOT AUTO-GENERATED PROPERTY\n"
-"\tuint8_t\t\t\t\tUnknownData00[0x4];\t\t\t\t\t\t// 0x0094 (0x04) NOT AUTO-GENERATED PROPERTY\n"
+"\tuint8_t\t\t\t\tUnknownData[0x18];\t\t\t\t\t\t// 0x0080 (0x18) NOT AUTO-GENERATED PROPERTY\n"
 "\tunsigned long\t\tOffset;\t\t\t\t\t\t\t\t\t// 0x0098 (0x04) NOT AUTO-GENERATED PROPERTY\n"
 "\tuint8_t\t\t\t\tUnknownData01[0x2C];\t\t\t\t\t// 0x009C (0x30) NOT AUTO-GENERATED PROPERTY\n";
 

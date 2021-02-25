@@ -22,21 +22,8 @@
 #include "Engine/Rocket League/Configuration.h"
 
 /*
-	Current Changes in v2.0.8:
-	- Fixed writing the wrong size for the wrong property size detection.
-	- Fixed the UFunction class for Rocket League.
-	- Added all the non auto-generated property class fields from GameDefines to the generator.
-	- Added being able to use process event offset to the UsingOffsets option now.
-	- GetName, GetNameCPP, GetFullName, all return strings now.
-	- Changed/improved one of the constructors for FName.
-	- Switched from using fopen_s and sprintf_s for files to ofstream with a custom file class.
-	- Fixed writing missed offset in UObject if you didnt use the UsingDetours option.
-	- Changed how the generator calculates generation time.
-	- Added more filesystem exists checks.
-	- Fixed various comment spacing issues.
-	- Fixed the UComponentProperty class.
-	- Made all addresses print in uppercase now.
-	- Removed writing offsets in the log file because there was no reason to in the first place.
+	Current Changes in v2.0.9:
+	- 
 
 	TO-DO:
 	- Reverse FScriptDelegate.

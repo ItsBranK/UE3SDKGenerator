@@ -424,7 +424,6 @@ namespace Retrievers
             }
             else if (uProperty->IsA(UMapProperty::StaticClass()))
             {
-                //return 0x3C;
                 return uProperty->ElementSize;
             }
             else if (uProperty->IsA(UIntProperty::StaticClass()))
@@ -1227,7 +1226,7 @@ namespace ClassGenerator
 
                     Retrievers::GetAllPropertyFlags(flagStream, uProperty->PropertyFlags);
 
-                    uint32_t offsetError = (uProperty->ElementSize * uProperty->ArrayDim) - (correctElementSize * uProperty->ArrayDim);
+                    int32_t offsetError = (uProperty->ElementSize * uProperty->ArrayDim) - (correctElementSize * uProperty->ArrayDim);
 
                     classStream << "\t";
 
@@ -2760,7 +2759,7 @@ void onAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-    Generator::DumpInstances(true, false, true);
+   // Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
