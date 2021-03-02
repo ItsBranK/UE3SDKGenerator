@@ -141,12 +141,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Engine\ASTRONEER\Configuration.cpp" />
+    <ClCompile Include="Engine\ASTRONEER\GameDefines.cpp" />
     <ClCompile Include="Engine\Rocket League\Configuration.cpp" />
     <ClCompile Include="Engine\Rocket League\GameDefines.cpp" />
     <ClCompile Include="Printers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.h" />
+    <ClInclude Include="Engine\ASTRONEER\Configuration.h" />
+    <ClInclude Include="Engine\ASTRONEER\GameDefines.h" />
+    <ClInclude Include="Engine\ASTRONEER\ObjectFunctions.h" />
+    <ClInclude Include="Engine\ASTRONEER\PiecesOfCode.h" />
     <ClInclude Include="Engine\Rocket League\Configuration.h" />
     <ClInclude Include="Engine\Rocket League\GameDefines.h" />
     <ClInclude Include="Engine\Rocket League\ObjectFunctions.h" />

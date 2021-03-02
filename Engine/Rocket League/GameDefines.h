@@ -388,8 +388,29 @@ extern TArray<struct FNameEntry*>* GNames;
 
 struct FNameEntry
 {
-	uint8_t			UnknownData00[0x18];
-	wchar_t			Name[0x100];
+public:
+	int64_t			Flags;										// 0x0000 (0x08)
+	int32_t			Index;										// 0x0008 (0x04)
+	uint8_t			UnknownData00[0xC];							// 0x000C (0x0C)
+	wchar_t			Name[0x400];								// 0x0018 (0x00)
+
+public:
+	int32_t GetIndex() const
+	{
+		return Index;
+	}
+
+	std::string GetName() const
+	{
+		std::wstring ws(Name);
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+
+	const wchar_t* GetWideName() const
+	{
+		return Name;
+	}
 };
 
 struct FName
@@ -597,7 +618,7 @@ public:
 
 	bool operator!=(const FString& other)
 	{
-		return (!wcscmp(ArrayData, other.ArrayData));
+		return (wcscmp(ArrayData, other.ArrayData));
 	}
 };
 

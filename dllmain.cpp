@@ -2614,21 +2614,16 @@ namespace Generator
                 file.NewLine();
                 file.NewLine();
 
-                for (int32_t i = 0; i < FName::Names()->Num(); i++)
+                for (auto& name : *FName::Names())
                 {
-                    FNameEntry* fnameEntry = FName::Names()->At(i);
-
-                    if (fnameEntry)
+                    if (name)
                     {
-                        std::wstring wideStr(fnameEntry->Name);
-                        std::string str(wideStr.begin(), wideStr.end());
-
                         file.Write("Name[");
                         file.Pad('0', 6, false);
-                        file.Write(std::to_string(i));
-                        file.Write("] " + str + " ");
-                        file.Pad(' ', 50 - str.length(), false);
-                        file.Hex(reinterpret_cast<uintptr_t>(fnameEntry), Configuration::Alignment);
+                        file.Write(std::to_string(name->GetIndex()));
+                        file.Write("] " + name->GetName() + " ");
+                        file.Pad(' ', 50 - name->GetName().length(), false);
+                        file.Hex(reinterpret_cast<uintptr_t>(name), Configuration::Alignment);
                         file.NewLine();
                     }
                 }
@@ -2755,11 +2750,11 @@ namespace Generator
     }
 }
 
-void onAttach(HMODULE hModule)
+void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-   // Generator::DumpInstances(true, false, true);
+    //Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -2767,7 +2762,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(onAttach), nullptr, 0, nullptr);
+        CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(OnAttach), nullptr, 0, nullptr);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

@@ -23,10 +23,13 @@
 
 /*
 	Current Changes in v2.0.9:
-	- 
+	- Changed how GName instances are dumped.
+	- Increased FNameEntry's buffer.
+	- Added GetName, GetIndex, and GetWideName functions to the FNameEntry struct.
+	- Updated pieces of code.
 
 	TO-DO:
-	- Reverse FScriptDelegate.
+	- Fully reverse FScriptDelegate.
 	- Figure out how TMap (UMapProperty) works, both key and value are null.
 	- Figure out why some shit is off by 4 bytes seemingly randomly, happens on both x32 and x64 modes.
 */

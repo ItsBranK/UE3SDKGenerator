@@ -34,7 +34,7 @@ namespace Configuration
     std::string GameName = "Rocket League";
     std::string GameNameShort = "RLSDK";
     std::string GameVersion = "210209.63888.312452";
-    std::string GeneratorVersion = "v2.0.8";
+    std::string GeneratorVersion = "v2.0.9";
     std::string GeneratorCredits = "TheFeckless, ItsBranK";
     std::string GeneratorLinks = "www.github.com/ItsBranK/UE3SDKGenerator, www.twitter.com/ItsBranK";
     std::string GeneratorDirectory = "UE3SDKGenerator";

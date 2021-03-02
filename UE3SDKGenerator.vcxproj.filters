@@ -15,6 +15,9 @@
     <Filter Include="Engine\Rocket League">
       <UniqueIdentifier>{6a793848-84ba-4b9d-9ae7-d5c1f395fa99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\ASTRONEER">
+      <UniqueIdentifier>{de855805-aced-4425-a032-ae69be786778}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -28,6 +31,12 @@
     </ClCompile>
     <ClCompile Include="Engine\Rocket League\Configuration.cpp">
       <Filter>Engine\Rocket League</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ASTRONEER\Configuration.cpp">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ASTRONEER\GameDefines.cpp">
+      <Filter>Engine\ASTRONEER</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +60,18 @@
     </ClInclude>
     <ClInclude Include="Engine\Rocket League\Configuration.h">
       <Filter>Engine\Rocket League</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\Configuration.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\GameDefines.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\ObjectFunctions.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\PiecesOfCode.h">
+      <Filter>Engine\ASTRONEER</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
