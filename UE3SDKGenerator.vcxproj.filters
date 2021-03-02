@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{c2909db8-7df0-479c-9864-696d3e87ee8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Rocket League">
+      <UniqueIdentifier>{6a793848-84ba-4b9d-9ae7-d5c1f395fa99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ASTRONEER">
+      <UniqueIdentifier>{de855805-aced-4425-a032-ae69be786778}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Printers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rocket League\GameDefines.cpp">
+      <Filter>Engine\Rocket League</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rocket League\Configuration.cpp">
+      <Filter>Engine\Rocket League</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ASTRONEER\Configuration.cpp">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ASTRONEER\GameDefines.cpp">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dllmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Printers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rocket League\GameDefines.h">
+      <Filter>Engine\Rocket League</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rocket League\ObjectFunctions.h">
+      <Filter>Engine\Rocket League</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rocket League\PiecesOfCode.h">
+      <Filter>Engine\Rocket League</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rocket League\Configuration.h">
+      <Filter>Engine\Rocket League</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\Configuration.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\GameDefines.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\ObjectFunctions.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ASTRONEER\PiecesOfCode.h">
+      <Filter>Engine\ASTRONEER</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
