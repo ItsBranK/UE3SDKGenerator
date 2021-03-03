@@ -592,7 +592,7 @@ public:
 public:
 	std::string ToString() const
 	{
-		if (!IsValid())
+		if (IsValid())
 		{
 			std::wstring wideStr(ArrayData);
 			std::string str(wideStr.begin(), wideStr.end());
@@ -604,7 +604,12 @@ public:
 
 	bool IsValid() const
 	{
-		return !ArrayData;
+		if (ArrayData)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	FString operator=(ElementPointer other)
