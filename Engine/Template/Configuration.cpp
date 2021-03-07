@@ -31,9 +31,9 @@ namespace Configuration
     const char* GNamesMask = (const char*)"null";
     uintptr_t GNamesOffset = (uintptr_t)0x0;
 
-    std::string GameName = "Rocket League";
-    std::string GameNameShort = "RLSDK";
-    std::string GameVersion = "210209.63888.312452";
+    std::string GameName = "Games Full Name";
+    std::string GameNameShort = "GAMESDK";
+    std::string GameVersion = "1.0.0";
     std::string GeneratorVersion = "v2.0.9";
     std::string GeneratorCredits = "TheFeckless, ItsBranK";
     std::string GeneratorLinks = "www.github.com/ItsBranK/UE3SDKGenerator, www.twitter.com/ItsBranK";

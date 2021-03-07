@@ -392,7 +392,8 @@ public:
 	int64_t			Flags;										// 0x0000 (0x08)
 	int32_t			Index;										// 0x0008 (0x04)
 	uint8_t			UnknownData00[0xC];							// 0x000C (0x0C)
-	wchar_t			Name[0x400];								// 0x0018 (0x00)
+	wchar_t			Name[0x400];								// 0x0018 (0x00) // Will either be char, or wchar_t depending on the game.
+	//char			Name[0x400];								// 0x0018 (0x00)
 
 public:
 	int32_t GetIndex() const
@@ -407,16 +408,26 @@ public:
 		return str;
 	}
 
+	//std::string GetName() const
+	//{
+	//	return Name;
+	//}
+
 	const wchar_t* GetWideName() const
 	{
 		return Name;
 	}
+
+	//const char* GetAnsiName() const
+	//{
+	//	return Name;
+	//}
 };
 
 struct FName
 {
 public:
-	using ElementType = const wchar_t;
+	using ElementType = const wchar_t; // Will either be const char, or const wchar_t depending on the game.
 	using ElementPointer = ElementType*;
 
 private:
@@ -546,7 +557,7 @@ public:
 struct FString
 {
 public:
-	using ElementType = const wchar_t;
+	using ElementType = const wchar_t; // Will either be const char, or const wchar_t depending on the game.
 	using ElementPointer = ElementType*;
 
 private:
@@ -581,7 +592,7 @@ public:
 public:
 	std::string ToString() const
 	{
-		if (!IsValid())
+		if (IsValid())
 		{
 			std::wstring wideStr(ArrayData);
 			std::string str(wideStr.begin(), wideStr.end());
@@ -593,7 +604,12 @@ public:
 
 	bool IsValid() const
 	{
-		return !ArrayData;
+		if (ArrayData)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	FString operator=(ElementPointer other)
@@ -646,23 +662,11 @@ struct FQWord
 */
 
 // Class Core.Object
-// (0x0000 - 0x0060)
+// (0x0000 - 0x0000)
 class UObject
 {
 public:
-	struct FPointer		VfTableObject;							// 0x0000 (0x08)
-	struct FPointer		HashNext;								// 0x0008 (0x08)
-	int64_t				ObjectFlags;							// 0x0010 (0x08)
-	struct FPointer		HashOuterNext;							// 0x0018 (0x08)
-	struct FPointer		StateFrame;								// 0x0020 (0x08)
-	class UObject*		Linker;									// 0x0028 (0x08)
-	struct FPointer		LinkerIndex;							// 0x0030 (0x08)
-	int32_t				ObjectInternalInteger;					// 0x0038 (0x04)
-	int32_t             NetIndex;								// 0x003C (0x04)
-	class UObject*		Outer;									// 0x0040 (0x08)
-	struct FName		Name;									// 0x0048 (0x02)
-	class UClass*		Class;									// 0x0050 (0x08)
-	class UObject*		ObjectArchetype;						// 0x0058 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -693,12 +697,11 @@ public:
 };
 
  //Class Core.Field
- //0x0010 (0x0060 - 0x0070)
+// (0x0000 - 0x0000)
 class UField : public UObject
 {
 public:
-	class UField*		Next;									// 0x0060 (0x08)
-	uint8_t				UnknownData00[0x8];						// 0x0068 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -714,11 +717,11 @@ public:
 };
 
 // Class Core.Enum
-// 0x000C (0x0070 - 0x007C)
+// (0x0000 - 0x0000)
 class UEnum : public UField
 {
 public:
-	TArray<FName>		Names;									// 0x0070 (0x0C)
+	TArray<FName>		Names;									// 0x0000 (0x0C)
 public:
 	static UClass* StaticClass()
 	{
@@ -734,11 +737,11 @@ public:
 };
 
 // Class Core.Const
-// 0x000C (0x0070 - 0x007C)
+// (0x0000 - 0x0000)
 class UConst : public UField
 {
 public:
-	struct FString		Value;									// 0x0070 (0x10)
+	struct FString		Value;									// 0x0000 (0x10)
 public:
 	static UClass* StaticClass()
 	{
@@ -754,16 +757,11 @@ public:
 };
 
 // Class Core.Property
-// 0x00C8 (0x0070 - 0x00C8)
+// 0x0000 (0x0000 - 0x0000)
 class UProperty : public UField
 {
 public:
-	unsigned long		ArrayDim;								// 0x0070 (0x04)
-	unsigned long		ElementSize;							// 0x0074 (0x04)
-	int64_t				PropertyFlags;							// 0x0078 (0x08)
-	uint8_t				UnknownData[0x18];						// 0x0080 (0x18)
-	unsigned long		Offset;									// 0x0098 (0x04)
-	uint8_t				UnknownData01[0x2C];					// 0x009C (0x30)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -779,15 +777,11 @@ public:
 };
 
 // Class Core.Struct
-// 0x00C0 (0x0070 - 0x0130)
+// 0x0000 (0x0000 - 0x0000)
 class UStruct : public UField
 {
 public:
-	uint8_t				UnknownData00[0x10];					// 0x0070 (0x10)
-	class UField*		SuperField;								// 0x0080 (0x08)
-	class UField*		Children;								// 0x0088 (0x08)
-	unsigned long		PropertySize;							// 0x0090 (0x04)
-	uint8_t				UnknownData01[0x9C];					// 0x0094 (0x9C)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -803,20 +797,11 @@ public:
 };
 
 // Class Core.Function
-// 0x0030 (0x0130 - 0x0160)
+// 0x0000 (0x0000 - 0x0000)
 class UFunction : public UStruct
 {
 public:
-	int64_t				FunctionFlags;							// 0x0130 (0x08)
-	uint16_t			iNative;								// 0x0138 (0x02)
-	uint16_t			RepOffset;								// 0x013A (0x02)
-	struct FName		FriendlyName;							// 0x013C (0x08)
-	uint8_t				OperatorPrecedence;						// 0x0144 (0x01)
-	uint8_t				NumParms;								// 0x0145 (0x01)
-	uint16_t			ParmsSize;								// 0x0146 (0x02)
-	unsigned long		ReturnValueOffset;						// 0x0148 (0x04)
-	uint8_t				UnknownData00[0xC];						// 0x014C (0x12)
-	FPointer			Func;									// 0x0158 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -834,11 +819,11 @@ public:
 };
 
 // Class Core.ScriptStruct
-// 0x0028 (0x0130 - 0x0158)
+// 0x0000 (0x0000 - 0x0000)
 class UScriptStruct : public UStruct
 {
 public:
-	uint8_t				UnknownData00[0x28];					// 0x0130 (0x28)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -858,7 +843,7 @@ public:
 class UState : public UStruct
 {
 public:
-	uint8_t				UnknownData00[0x60];					// 0x0130 (0x60)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -878,7 +863,7 @@ public:
 class UClass : public UState
 {
 public:
-	uint8_t				UnknownData00[0x228];					// 0x0190 (0x228)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -900,11 +885,11 @@ public:
 */
 
  //Class Core.StructProperty
- //0x0008 (0x00C8 - 0x00D0)
+// 0x0000 (0x0000 - 0x0000)
 class UStructProperty : public UProperty
 {
 public:
-	class UStruct*		Struct;									// 0x00C8 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -920,7 +905,7 @@ public:
 };
 
 // Class Core.StrProperty
-// 0x00C8 (0x00C8 - 0x00C8)
+// 0x0000 (0x0000 - 0x0000)
 class UStrProperty : public UProperty
 {
 public:
@@ -939,7 +924,7 @@ public:
 };
 
 // Class Core.QWordProperty
-// 0x00C8 (0x00C8 - 0x00C8)
+// 0x0000 (0x0000 - 0x0000)
 class UQWordProperty : public UProperty
 {
 public:
@@ -958,12 +943,11 @@ public:
 };
 
 // Class Core.ObjectProperty
-// 0x0010 (0x00C8 - 0x00D8)
+// 0x0000 (0x0000 - 0x0000)
 class UObjectProperty : public UProperty
 {
 public:
-	class UClass*		PropertyClass;							// 0x00C8 (0x08)
-	uint8_t				UnknownData00[0x08];					// 0x00D0 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -979,7 +963,7 @@ public:
 };
 
 // Class Core.ComponentProperty
-// 0x0000 (0x00D8 - 0x00D8)
+// 0x0000 (0x0000 - 0x0000)
 class UComponentProperty : public UObjectProperty
 {
 public:
@@ -998,11 +982,11 @@ public:
 };
 
 // Class Core.ClassProperty
-// 0x0008 (0x00D8 - 0x00E0)
+// 0x0000 (0x0000 - 0x0000)
 class UClassProperty : public UObjectProperty
 {
 public:
-	class UClass*		MetaClass;								// 0x00D8 (0x08)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -1018,7 +1002,7 @@ public:
 };
 
 // Class Core.NameProperty
-// 0x00C8 (0x00C8 - 0x00C8)
+// 0x00C8 (0x0000 - 0x0000)
 class UNameProperty : public UProperty
 {
 public:
@@ -1037,7 +1021,7 @@ public:
 };
 
 // Class Core.MapProperty
-// 0x0010 (0x00C8 - 0x0D8)
+// 0x0010 (0x0000 - 0x0000)
 class UMapProperty : public UProperty
 {
 public:
@@ -1097,7 +1081,7 @@ public:
 };
 
 // Class Core.FloatProperty
-// 0x00C8 (0x00C8 - 0x00C8)
+// 0x0000 (0x0000 - 0x0000)
 class UFloatProperty : public UProperty
 {
 public:
@@ -1116,11 +1100,11 @@ public:
 };
 
 // Class Core.DelegateProperty
-// 0x0010 (0x00C8 - 0x00D8)
+// 0x0000 (0x0000 - 0x0000)
 class UDelegateProperty : public UProperty
 {
 public:
-	uint8_t				UnknownData00[0x10];					// 0x00C8 (0x10)
+	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
 public:
 	static UClass* StaticClass()
 	{
@@ -1136,7 +1120,7 @@ public:
 };
 
 // Class Core.ByteProperty
-// 0x0008 (0x00C8 - 0x00D0)
+// 0x0008 (0x0000 - 0x0000)
 class UByteProperty : public UProperty
 {
 public:
@@ -1156,7 +1140,7 @@ public:
 };
 
 // Class Core.BoolProperty
-// 0x0008 (0x00C8 - 0x00D0)
+// 0x0008 (0x0000 - 0x0000)
 class UBoolProperty : public UProperty
 {
 public:
@@ -1176,7 +1160,7 @@ public:
 };
 
 // Class Core.ArrayProperty
-// 0x0008 (0x00C8 - 0x00D0)
+// 0x0008 (0x0000 - 0x0000)
 class UArrayProperty : public UProperty
 {
 public:
