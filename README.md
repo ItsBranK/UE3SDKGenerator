@@ -36,7 +36,7 @@ Customize the spacing for comments, constants, structs, enums, functions, classe
 
 ### Configuration
 
-To get started in generating an sdk, copy  and paste the `Rocket League` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.h` file will need to be reversed by hand for each game that you want to use. Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file and make sure you have the right `Engine` files included for your game in `dllmain.h`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
+To get started in generating an sdk, copy  and paste the `Teamplate` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.h` file will need to be reversed by hand for each game that you want to use. Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file and make sure you have the right `Engine` files included for your game in `dllmain.h`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
 
 ### Finalization
 
