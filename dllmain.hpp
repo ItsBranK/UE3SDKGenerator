@@ -4,14 +4,8 @@
 #include "Engine/Engine.hpp"
 
 /*
-	Current Changes in v2.1.1:
-	- Moved the windows include headers and shit to "pch.hpp".
-	- Added PiecesOfCode.cpp and made the ones in the header file externs.
-	- Added Engine.hpp and Engine.cpp, generator info will be in here from now on as well as the includes for your engine files.
-	- Got rid of ObjectFunctions and moved everything to GameDefines.cpp, this also means I had to move the static template functions in the GameDefines.hpp file.
-	- Made the alignment value in Configuration.hpp/cpp an enum.
-	- Fixed the version number being wrong in the last update.
-	- Renamed h files to hpp cuz SEEE PLUS PLUSS!!!!
+	Current Changes in v2.1.2:
+	- Added "SendMessage" to the MakeWindowsFunction function, and also redid the function itself.
 
 	TO-DO:
 	- Fully reverse FScriptDelegate, which is hard to do if they are unbound.

@@ -2288,23 +2288,13 @@ namespace Generator
         size_t goW = functionName.find("GetObject");
         size_t dfW = functionName.find("DeleteFile");
         size_t dtW = functionName.find("DrawText");
+        size_t smW = functionName.find("SendMessage");
 
-        if (gctW != std::string::npos)
-        {
-            functionName += "W";
-        }
-
-        if (goW != std::string::npos)
-        {
-            functionName += "W";
-        }
-
-        if (dfW != std::string::npos)
-        {
-            functionName += "W";
-        }
-
-        if (dtW != std::string::npos)
+        if (gctW != std::string::npos
+            || goW != std::string::npos
+            || dfW != std::string::npos
+            || dtW != std::string::npos
+            || smW != std::string::npos)
         {
             functionName += "W";
         }
@@ -2730,7 +2720,7 @@ namespace Generator
 
         if (createLogFile && initialized)
         {
-           // uintptr_t GObjectsOffset = reinterpret_cast<uintptr_t>(GObjects) - baseAddress;
+            //uintptr_t GObjectsOffset = reinterpret_cast<uintptr_t>(GObjects) - baseAddress;
             //uintptr_t GNamesOffset = reinterpret_cast<uintptr_t>(GNames) - baseAddress;
 
             std::string directory = Engine::GeneratorDirectory;
