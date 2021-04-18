@@ -441,7 +441,7 @@ public:
 		InstanceNumber = 0;
 	}
 
-	FName(int32_t i)
+	FName(const int32_t& i)
 	{
 		FNameEntryId = i;
 		InstanceNumber = 0;
@@ -458,7 +458,7 @@ public:
 		{
 			if (Names()->At(name))
 			{
-				if (!wcscmp(Names()->At(nameCache[name])->Name, nameToFind))
+				if (wcscmp(Names()->At(nameCache[name])->Name, nameToFind))
 				{
 					FNameEntryId = nameCache[name];
 					return;
@@ -604,12 +604,7 @@ public:
 
 	bool IsValid() const
 	{
-		if (ArrayData)
-		{
-			return true;
-		}
-
-		return false;
+		return !!ArrayData;
 	}
 
 	FString operator=(ElementPointer other)
