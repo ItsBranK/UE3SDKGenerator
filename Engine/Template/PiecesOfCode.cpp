@@ -309,7 +309,7 @@ namespace PiecesOfCode
 		"\t\t{\n"
 		"\t\t\tif (Names()->At(i))\n"
 		"\t\t\t{\n"
-		"\t\t\t\tif (wcscmp(Names()->At(i)->Name, nameToFind))\n"
+		"\t\t\t\tif (!wcscmp(Names()->At(i)->Name, nameToFind))\n"
 		"\t\t\t\t{\n"
 		"\t\t\t\t\tnameCache.push_back(i);\n"
 		"\t\t\t\t\tFNameEntryId = i;\n"

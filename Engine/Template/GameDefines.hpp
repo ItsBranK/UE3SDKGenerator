@@ -458,7 +458,7 @@ public:
 		{
 			if (Names()->At(name))
 			{
-				if (wcscmp(Names()->At(nameCache[name])->Name, nameToFind))
+				if (!wcscmp(Names()->At(nameCache[name])->Name, nameToFind))
 				{
 					FNameEntryId = nameCache[name];
 					return;
@@ -470,7 +470,7 @@ public:
 		{
 			if (Names()->At(i))
 			{
-				if (wcscmp(Names()->At(i)->Name, nameToFind))
+				if (!wcscmp(Names()->At(i)->Name, nameToFind))
 				{
 					nameCache.push_back(i);
 					FNameEntryId = i;
