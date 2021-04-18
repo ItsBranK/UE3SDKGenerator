@@ -454,13 +454,13 @@ public:
 		FNameEntryId = 0;
 		InstanceNumber = 0;
 
-		for (int32_t name : nameCache)
+		for (int32_t entryId : nameCache)
 		{
-			if (Names()->At(name))
+			if (Names()->At(entryId))
 			{
-				if (!wcscmp(Names()->At(nameCache[name])->Name, nameToFind))
+				if (!wcscmp(Names()->At(entryId)->Name, nameToFind))
 				{
-					FNameEntryId = nameCache[name];
+					FNameEntryId = entryId;
 					return;
 				}
 			}
