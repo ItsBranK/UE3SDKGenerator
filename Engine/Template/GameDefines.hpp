@@ -466,11 +466,11 @@ public:
 			}
 		}
 
-		for (int i = 0; i < Names()->Num(); i++)
+		for (int32_t i = 0; i < Names()->Num(); i++)
 		{
 			if (Names()->At(i))
 			{
-				if (!wcscmp(Names()->At(i)->Name, nameToFind))
+				if (wcscmp(Names()->At(i)->Name, nameToFind))
 				{
 					nameCache.push_back(i);
 					FNameEntryId = i;
