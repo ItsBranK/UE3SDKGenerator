@@ -134,7 +134,7 @@ enum class EPropertyTypes : uint16_t
 	TYPE_FSTRING =                          18,
 	TYPE_FSCRIPTDELEGATE =                  19,
 	TYPE_FPOINTER =                         20,
-	TYPE_FSTRUCT =					        21,
+	TYPE_FSTRUCT =                          21,
 	TYPE_UPOINTER =                         22,
 };
 
