@@ -35,6 +35,9 @@
     <ClCompile Include="Engine\Rocket League\PiecesOfCode.cpp">
       <Filter>Engine\Rocket League</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.hpp">

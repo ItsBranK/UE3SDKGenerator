@@ -240,7 +240,6 @@ namespace PiecesOfCode
 		"public:\n"
 		"\tint64_t\t\t\tFlags;\t\t\t\t\t\t\t\t\t\t// 0x0000 (0x08)\n"
 		"\tint32_t\t\t\tIndex;\t\t\t\t\t\t\t\t\t\t// 0x0008 (0x04)\n"
-		"\tuint8_t\t\t\tUnknownData00[0xC];\t\t\t\t\t\t\t// 0x000C (0x0C)\n"
 		"\twchar_t\t\t\tName[0x400];\t\t\t\t\t\t\t\t// 0x0018 (0x00)\n"
 		"\n"
 		"public:\n"

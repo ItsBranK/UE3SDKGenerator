@@ -145,6 +145,7 @@
     <ClCompile Include="Engine\Rocket League\Configuration.cpp" />
     <ClCompile Include="Engine\Rocket League\GameDefines.cpp" />
     <ClCompile Include="Engine\Rocket League\PiecesOfCode.cpp" />
+    <ClCompile Include="pch.cpp" />
     <ClCompile Include="Printers.cpp" />
   </ItemGroup>
   <ItemGroup>
