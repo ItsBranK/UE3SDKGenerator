@@ -1802,17 +1802,9 @@ namespace FunctionGenerator
                     propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique));
                     propertySpecialParams.push_back(make_pair(uProperty, propertyNameUnique));
                 }
-                else
+                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
                 {
-                    if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm)
-                    {
-                        propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique));
-                    }
-                    
-                    if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
-                    {
-                        propertyParams.push_back(make_pair(uProperty, propertyNameUnique));
-                    }
+                    propertyParams.push_back(make_pair(uProperty, propertyNameUnique));
                 }
             }
 
