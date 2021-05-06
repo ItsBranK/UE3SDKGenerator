@@ -111,7 +111,7 @@ enum EPropertyFlags
 };
 
 // Property Types
-enum class EPropertyTypes : uint16_t
+enum class EPropertyTypes : uint8_t
 {
 	TYPE_UNKNOWN =                          0,
 	TYPE_INT8 =                             1,
@@ -139,7 +139,7 @@ enum class EPropertyTypes : uint16_t
 };
 
 // Width Types
-enum class EWidthTypes : uint16_t
+enum class EWidthTypes : uint8_t
 {
 	WIDTH_NONE =                            0,
 	WIDTH_BYTE =                            2,
@@ -220,6 +220,8 @@ public:
 	}
 };
 
+// TArray
+// (0x0000 - 0x0010)
 template<typename InElementType>
 struct TArray
 {
@@ -402,16 +404,16 @@ public:
 		return Index;
 	}
 
-	std::string GetName() const
+	std::string ToString() const
 	{
 		std::wstring ws(Name);
 		std::string str(ws.begin(), ws.end());
 		return str;
 	}
 
-	//std::string GetName() const
+	//std::string ToString() const
 	//{
-	//	return Name;
+	//	return Name; // Does this mean it's not null terminated?
 	//}
 
 	const wchar_t* GetWideName() const
@@ -425,6 +427,9 @@ public:
 	//}
 };
 
+
+// FName
+// (0x0000 - 0x0008)
 struct FName
 {
 public:
@@ -483,9 +488,9 @@ public:
 	~FName() {}
 
 public:
-	static TArray<FNameEntry*>* Names()
+	static struct TArray<struct FNameEntry*>* Names()
 	{
-		TArray<struct FNameEntry*>* GNamesArray = reinterpret_cast<TArray<struct FNameEntry*>*>(GNames);
+		TArray<FNameEntry*>* GNamesArray = reinterpret_cast<TArray<FNameEntry*>*>(GNames);
 		return GNamesArray;
 	}
 
@@ -515,7 +520,7 @@ public:
 		return InstanceNumber;
 	}
 
-	void SetNumber(int32_t newNumber)
+	void SetNumber(const int32_t& newNumber)
 	{
 		InstanceNumber = newNumber;
 	}
@@ -524,9 +529,7 @@ public:
 	{
 		if (IsValid())
 		{
-			std::wstring ws(GetDisplayNameEntry().Name);
-			std::string str(ws.begin(), ws.end());
-			return str;
+			return GetDisplayNameEntry().ToString();
 		}
 
 		return std::string("UnknownName");
@@ -534,7 +537,7 @@ public:
 
 	bool IsValid() const
 	{
-		if (FNameEntryId > Names()->Num() || !Names()->At(FNameEntryId))
+		if (FNameEntryId < 0 || FNameEntryId > Names()->Num())
 		{
 			return false;
 		}
@@ -542,23 +545,33 @@ public:
 		return true;
 	}
 
-	FName operator=(const FName& other)
+public:
+	struct FName operator=(const struct FName& other)
 	{
 		FNameEntryId = other.FNameEntryId;
 		InstanceNumber = other.InstanceNumber;
 		return *this;
 	}
 
-	bool operator==(const FName& other) const
+	bool operator==(const struct FName& other) const
 	{
 		return (FNameEntryId == other.FNameEntryId);
 	}
+
+	bool operator!=(const struct FName& other) const
+	{
+		return (FNameEntryId != other.FNameEntryId);
+	}
 };
 
+// FString
+// (0x0000 - 0x0008)
+// FString
+// (0x0000 - 0x0010)
 struct FString
 {
 public:
-	using ElementType = const wchar_t; // Will either be const char, or const wchar_t depending on the game.
+	using ElementType = const wchar_t;
 	using ElementPointer = ElementType*;
 
 private:
@@ -588,7 +601,7 @@ public:
 		}
 	}
 
-	~FString() {}
+	~FString() { }
 
 public:
 	std::string ToString() const
@@ -623,6 +636,7 @@ public:
 		return *this;
 	}
 
+public:
 	bool operator==(const FString& other)
 	{
 		return (!wcscmp(ArrayData, other.ArrayData));

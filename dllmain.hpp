@@ -4,10 +4,16 @@
 #include "Engine/Engine.hpp"
 
 /*
-	Current Changes in v2.1.2:
-	- Added "SendMessage" to the MakeWindowsFunction function, and also redid the function itself.
+	Current Changes in v2.1.3
+	- Fixed parameters not correctly being copied if they were BOTH a CPF_Parm and CPF_OutParm.
+	- Fixed not properly returning an out parameter they they were BOTH a CPF_Parm and CPF_OutParm.
+	- Included some links in "GameDefines.hpp" for the function/enum flags, along with some extra comments.
+	- Added some extra saftey checks for structs in "GameDefines.hpp" and fixed some spelling mistakes.
+	- Added UDelegateProperty to PiecesOfCode and the generator.
+	- Added the object pointer to FScriptDelegate.
 
 	TO-DO:
+	- Make some structs classes, fstring, tarray.
 	- Fully reverse FScriptDelegate, which is hard to do if they are unbound.
 	- I finally reversed TMap but still have no idea how to determine what the key and value objects are, they are always null. So wtf?
 	- Figure out why some shit is off by 4 bytes seemingly randomly, happens on both x32 and x64 modes.

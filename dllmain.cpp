@@ -996,7 +996,7 @@ namespace EnumGenerator
 
             std::map<std::string, uint32_t> propertiesMap;
 
-            for (int i = 0; i < uEnum->Names.Num(); i++)
+            for (int32_t i = 0; i < uEnum->Names.Num(); i++)
             {
                 std::string propertyName = Generator::GenerateValidName(uEnum->Names[i].ToString());
 
@@ -1143,6 +1143,7 @@ namespace ClassGenerator
         else if (uClass == UObject::FindClass("Class Core.ObjectProperty")) { classStream << PiecesOfCode::UObjectProperty_Fields; }
         else if (uClass == UObject::FindClass("Class Core.MapProperty")) { classStream << PiecesOfCode::UMapProperty_Fields; }
         else if (uClass == UObject::FindClass("Class Core.InterfaceProperty")) { classStream << PiecesOfCode::UInterfaceProperty_Fields; }
+        else if (uClass == UObject::FindClass("Class Core.DelegateProperty")) { classStream << PiecesOfCode::UDelegateProperty_Fields; }
         else if (uClass == UObject::FindClass("Class Core.ByteProperty")) { classStream << PiecesOfCode::UByteProperty_Fields; }
         else if (uClass == UObject::FindClass("Class Core.BoolProperty")) { classStream << PiecesOfCode::UBoolProperty_Fields; }
         else if (uClass == UObject::FindClass("Class Core.ArrayProperty")) { classStream << PiecesOfCode::UArrayProperty_Fields; }
@@ -1763,6 +1764,7 @@ namespace FunctionGenerator
 
             std::vector<std::pair<UProperty*, std::string>> propertyParams;
             std::vector<std::pair<UProperty*, std::string>> propertyOutParams;
+            std::vector<std::pair<UProperty*, std::string>> propertySpecialParams;
             std::pair<UProperty*, std::string> propertyReturnParm;
 
             std::map<std::string, uint32_t> propertyNameMap;
@@ -1791,13 +1793,32 @@ namespace FunctionGenerator
                     propertyNameMap[propertyNameBuffer]++;
                 }
 
-                if (uProperty->PropertyFlags & EPropertyFlags::CPF_ReturnParm) { propertyReturnParm = make_pair(uProperty, propertyNameUnique); }
-                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm) { propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique)); }
-                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm) { propertyParams.push_back(make_pair(uProperty, propertyNameUnique)); }
+                if (uProperty->PropertyFlags & EPropertyFlags::CPF_ReturnParm)
+                {
+                    propertyReturnParm = make_pair(uProperty, propertyNameUnique);
+                }
+                else if ((uProperty->PropertyFlags & EPropertyFlags::CPF_Parm) && (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm))
+                {
+                    propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique));
+                    propertySpecialParams.push_back(make_pair(uProperty, propertyNameUnique));
+                }
+                else
+                {
+                    if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm)
+                    {
+                        propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique));
+                    }
+
+                    if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
+                    {
+                        propertyParams.push_back(make_pair(uProperty, propertyNameUnique));
+                    }
+                }
             }
 
             sort(propertyParams.begin(), propertyParams.end(), Utils::SortPropertyPair);
             sort(propertyOutParams.begin(), propertyOutParams.end(), Utils::SortPropertyPair);
+            sort(propertySpecialParams.begin(), propertySpecialParams.end(), Utils::SortPropertyPair);
 
             codeStream << "\n// Parameter info:\n";
 
@@ -1933,19 +1954,52 @@ namespace FunctionGenerator
 
                 EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
 
-                if (propertyTypeResult != EPropertyTypes::TYPE_UNKNOWN)
+                if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_Parm)
                 {
-                    if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
+                    EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
+
+                    if (propertyTypeResult != EPropertyTypes::TYPE_UNKNOWN)
                     {
-                        codeStream << "\tmemcpy_s(&" << functionName << "_Params." << uProperty.second << ", ";
-                        Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
-                        codeStream << ", &" << uProperty.second << ", ";
-                        Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
-                        codeStream << ");\n";
+                        if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
+                        {
+                            codeStream << "\tmemcpy_s(&" << functionName << "_Params." << uProperty.second << ", ";
+                            Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                            codeStream << ", &" << uProperty.second << ", ";
+                            Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                            codeStream << ");\n";
+                        }
+                        else if (!Utils::IsStructProperty(propertyTypeResult))
+                        {
+                            codeStream << "\t" << uProperty.second << " = " << functionName << "_Params." << uProperty.second << ";\n";
+                        }
                     }
-                    else if (!Utils::IsStructProperty(propertyTypeResult))
+                }
+            }
+
+            for (size_t i = 0; i < propertySpecialParams.size(); i++)
+            {
+                std::pair<UProperty*, std::string> uProperty(propertySpecialParams[i]);
+
+                EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
+
+                if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_Parm)
+                {
+                    EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
+
+                    if (propertyTypeResult != EPropertyTypes::TYPE_UNKNOWN)
                     {
-                        codeStream << "\t" << functionName << "_Params." << uProperty.second << " = " << uProperty.second << ";\n";
+                        if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
+                        {
+                            codeStream << "\tmemcpy_s(&" << functionName << "_Params." << uProperty.second << ", ";
+                            Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                            codeStream << ", &" << uProperty.second << ", ";
+                            Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                            codeStream << ");\n";
+                        }
+                        else if (!Utils::IsStructProperty(propertyTypeResult))
+                        {
+                            codeStream << "\t" << uProperty.second << " = " << functionName << "_Params." << uProperty.second << ";\n";
+                        }
                     }
                 }
             }
@@ -1984,7 +2038,7 @@ namespace FunctionGenerator
                 {
                     std::pair<UProperty*, std::string> uProperty(propertyOutParams[i]);
 
-                    if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_Parm)
+                    if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_OutParm)
                     {
                         EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
 
@@ -1995,6 +2049,26 @@ namespace FunctionGenerator
                                 codeStream << "\tmemcpy_s(&" << functionName << "_Params." << uProperty.second << ", ";
                                 Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
                                 codeStream << ", &" << uProperty.second << ", ";
+                                Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                                codeStream << ");\n";
+                            }
+                            else if (!Utils::IsStructProperty(propertyTypeResult))
+                            {
+                                codeStream << "\t" << uProperty.second << " = " << functionName << "_Params." << uProperty.second << ";\n";
+                            }
+                        }
+                    }
+                    else if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_Parm)
+                    {
+                        EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
+
+                        if (propertyTypeResult != EPropertyTypes::TYPE_UNKNOWN)
+                        {
+                            if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
+                            {
+                                codeStream << "\tmemcpy_s(&" << uProperty.second << ", ";
+                                Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                                codeStream << ", &" << functionName << "_Params." << uProperty.second << ", ";
                                 Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
                                 codeStream << ");\n";
                             }
@@ -2070,9 +2144,20 @@ namespace FunctionGenerator
                     propertyNameMap[propertyNameBuffer]++;
                 }
 
-                if (uProperty->PropertyFlags & EPropertyFlags::CPF_ReturnParm) { propertyReturnParm = std::make_pair(uProperty, propertyNameUnique); }
-                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm) { propertyOutParams.push_back(std::make_pair(uProperty, propertyNameUnique)); }
-                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm) { propertyParams.push_back(std::make_pair(uProperty, propertyNameUnique)); }
+                if (uProperty->PropertyFlags & EPropertyFlags::CPF_ReturnParm)
+                {
+                    propertyReturnParm = std::make_pair(uProperty, propertyNameUnique);
+                }
+
+                if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm)
+                {
+                    propertyOutParams.push_back(std::make_pair(uProperty, propertyNameUnique));
+                }
+
+                if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
+                {
+                    propertyParams.push_back(std::make_pair(uProperty, propertyNameUnique));
+                }
             }
 
             std::sort(propertyParams.begin(), propertyParams.end(), Utils::SortPropertyPair);
@@ -2593,6 +2678,10 @@ namespace Generator
 
             if (dumpGNames)
             {
+                std::ofstream stim;
+
+                stim.close();
+
                 File file;
                 file.Create(fullDirectory, "NameDump.txt");
 
@@ -2611,8 +2700,8 @@ namespace Generator
                         file.Write("Name[");
                         file.Pad('0', 6, false);
                         file.Write(std::to_string(name->GetIndex()));
-                        file.Write("] " + name->GetName() + " ");
-                        file.Pad(' ', 50 - name->GetName().length(), false);
+                        file.Write("] " + name->ToString() + " ");
+                        file.Pad(' ', 50 - name->ToString().length(), false);
                         file.Hex(reinterpret_cast<uintptr_t>(name), static_cast<uint8_t>(Configuration::Alignment));
                         file.NewLine();
                     }
@@ -2704,8 +2793,8 @@ namespace Generator
             {
                 uintptr_t GObjectsAddress = Utils::FindPattern(GetModuleHandle(NULL), Configuration::GObjectsPattern, Configuration::GObjectsMask);
                 uintptr_t GNamesAddress = Utils::FindPattern(GetModuleHandle(NULL), Configuration::GNamesPattern, Configuration::GNamesMask);
-                GObjects = reinterpret_cast<TArray<class UObject*>*>(GObjectsAddress);
-                GNames = reinterpret_cast<TArray<struct FNameEntry*>*>(GNamesAddress);
+                GObjects = reinterpret_cast<TArray<UObject*>*>(GObjectsAddress);
+                GNames = reinterpret_cast<TArray<FNameEntry*>*>(GNamesAddress);
             } 
             else
             {
@@ -2750,7 +2839,7 @@ void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-    //Generator::DumpInstances(true, false, true);
+    Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)

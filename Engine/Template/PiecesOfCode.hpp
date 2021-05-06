@@ -29,6 +29,7 @@ namespace PiecesOfCode
 	extern const std::string UObjectProperty_Fields;
 	extern const std::string UMapProperty_Fields;
 	extern const std::string UInterfaceProperty_Fields;
+	extern const std::string UDelegateProperty_Fields;
 	extern const std::string UByteProperty_Fields;
 	extern const std::string UBoolProperty_Fields;
 	extern const std::string UArrayProperty_Fields;

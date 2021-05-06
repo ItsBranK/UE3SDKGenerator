@@ -248,7 +248,7 @@ namespace PiecesOfCode
 		"\t\treturn Index;\n"
 		"\t}\n"
 		"\n"
-		"\tconst std::string GetName() const\n"
+		"\tconst std::string ToString() const\n"
 		"\t{\n"
 		"\t\tstd::wstring ws(Name);\n"
 		"\t\tconst std::string str(ws.begin(), ws.end());\n"
@@ -357,11 +357,11 @@ namespace PiecesOfCode
 		"\t\tInstanceNumber = newNumber;\n"
 		"\t}\n"
 		"\n"
-		"\tconst std::string ToString()\n"
+		"\tstd::string ToString() const\n"
 		"\t{\n"
 		"\t\tif (IsValid())\n"
 		"\t\t{\n"
-		"\t\t\treturn GetEntry()->GetName();\n"
+		"\t\t\treturn GetDisplayNameEntry().ToString();\n"
 		"\t\t}\n"
 		"\n"
 		"\t\treturn const std::string(\"UnknownName\");\n"
@@ -377,6 +377,7 @@ namespace PiecesOfCode
 		"\t\treturn true;\n"
 		"\t}\n"
 		"\n"
+		"public:\n"
 		"\tFName operator=(const FName& other)\n"
 		"\t{\n"
 		"\t\tFNameEntryId = other.FNameEntryId;\n"
@@ -513,6 +514,8 @@ namespace PiecesOfCode
 	const std::string UMapProperty_Fields = "\t//REPLACE ME IN PiecesOfCode.cpp";
 
 	const std::string UInterfaceProperty_Fields = "\t//REPLACE ME IN PiecesOfCode.cpp";
+
+	const std::string UDelegateProperty_Fields = "\t//REPLACE ME IN PiecesOfCode.cpp";
 
 	const std::string UByteProperty_Fields = "\t//REPLACE ME IN PiecesOfCode.cpp";
 
