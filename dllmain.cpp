@@ -1808,7 +1808,7 @@ namespace FunctionGenerator
                     {
                         propertyOutParams.push_back(make_pair(uProperty, propertyNameUnique));
                     }
-
+                    
                     if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
                     {
                         propertyParams.push_back(make_pair(uProperty, propertyNameUnique));
@@ -2148,13 +2148,11 @@ namespace FunctionGenerator
                 {
                     propertyReturnParm = std::make_pair(uProperty, propertyNameUnique);
                 }
-
-                if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm)
+                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm)
                 {
                     propertyOutParams.push_back(std::make_pair(uProperty, propertyNameUnique));
                 }
-
-                if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
+                else if (uProperty->PropertyFlags & EPropertyFlags::CPF_Parm)
                 {
                     propertyParams.push_back(std::make_pair(uProperty, propertyNameUnique));
                 }
@@ -2839,7 +2837,7 @@ void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-    Generator::DumpInstances(true, false, true);
+    //Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
