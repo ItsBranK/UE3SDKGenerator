@@ -4,7 +4,10 @@
 #include "Engine/Engine.hpp"
 
 /*
-	Current Changes in v2.1.3
+	Current Changes in v2.1.4
+	- Fixed not correctly setting input values if the parameter was a bitfield.
+
+	Changes in v2.1.3
 	- Fixed parameters not correctly being copied if they were BOTH a CPF_Parm and CPF_OutParm.
 	- Fixed not properly returning an out parameter they they were BOTH a CPF_Parm and CPF_OutParm.
 	- Included some links in "GameDefines.hpp" for the function/enum flags, along with some extra comments.
