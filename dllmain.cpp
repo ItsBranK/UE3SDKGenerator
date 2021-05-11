@@ -2038,26 +2038,6 @@ namespace FunctionGenerator
                         {
                             if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
                             {
-                                codeStream << "\tmemcpy_s(&" << functionName << "_Params." << uProperty.second << ", ";
-                                Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
-                                codeStream << ", &" << uProperty.second << ", ";
-                                Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
-                                codeStream << ");\n";
-                            }
-                            else if (!Utils::IsStructProperty(propertyTypeResult))
-                            {
-                                codeStream << "\t" << uProperty.second << " = " << functionName << "_Params." << uProperty.second << ";\n";
-                            }
-                        }
-                    }
-                    else if (uProperty.first->PropertyFlags & EPropertyFlags::CPF_Parm)
-                    {
-                        EPropertyTypes propertyTypeResult = Retrievers::GetPropertyType(uProperty.first, propertyType, false);
-
-                        if (propertyTypeResult != EPropertyTypes::TYPE_UNKNOWN)
-                        {
-                            if (!Utils::IsBitField(propertyTypeResult) || !Utils::IsBitField(uProperty.first->ArrayDim))
-                            {
                                 codeStream << "\tmemcpy_s(&" << uProperty.second << ", ";
                                 Printers::MakeHex(codeStream, (uProperty.first->ElementSize * uProperty.first->ArrayDim), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
                                 codeStream << ", &" << functionName << "_Params." << uProperty.second << ", ";
