@@ -36,9 +36,7 @@ Customize the spacing for comments, constants, structs, enums, functions, classe
 
 ### Configuration
 
-To get started in generating an sdk, copy  and paste the `Template` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.hpp` file will need to be reversed by hand for each game that you want to use.
-
-In `Configuration.hpp` uncomment which character type your game uses, it will either be wide char (UTF16) or const char (UTF8).
+To get started in generating an sdk, copy  and paste the `Template` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.hpp` file will need to be reversed by hand for each game that you want to use. In `Configuration.hpp` uncomment which character type your game uses, it will either be wide char (UTF16) or const char (UTF8).
 
 ![](https://i.imgur.com/gbIfB3R.png)
 
