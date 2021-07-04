@@ -38,6 +38,10 @@ Customize the spacing for comments, constants, structs, enums, functions, classe
 
 To get started in generating an sdk, copy  and paste the `Template` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.hpp` file will need to be reversed by hand for each game that you want to use.
 
+In `Configuration.hpp` uncomment which character type your game uses, it will either be wide char (UTF16) or const char (UTF8).
+
+![](https://i.imgur.com/gbIfB3R.png)
+
 Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, you do NOT need to register any kind of padding or any field that is NOT in the `EFieldIds` enum. The offsets and sizes will all be dynamically calculated after the fact.
 
 Here is an example of how to register fields, there are more examples in the `Template` folder, as well as comments throughout to help you if you encounter any errors with the template.
