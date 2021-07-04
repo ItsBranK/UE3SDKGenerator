@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <filesystem>
 
 /*
 # ========================================================================================= #
@@ -7,13 +8,17 @@
 # ========================================================================================= #
 */
 
-// These are global variables, make changes in the cpp file only!
+// Comment & uncomment these depending on what your game uses!
+#define CHARACTER_UTF16
+//#define CHARACTER_UTF8
 
-enum class EAlignment : uint8_t
+enum class EAlignment : int32_t
 {
 	X32BIT = 0x4,
 	X64BIT = 0x8
 };
+
+// These are global variables below, make changes in the cpp file only!
 
 namespace Configuration
 {
@@ -21,6 +26,7 @@ namespace Configuration
 	extern const bool UsingOffsets;
 	extern const bool UsingDetours;
 	extern const bool UsingEnumClasses;
+	extern const std::string EnumClassType;
 
 	extern const int32_t CommentSpacer;
 	extern const int32_t ConstSpacer;
@@ -34,7 +40,6 @@ namespace Configuration
 	extern const std::string ProcessEventString;
 	extern const uint8_t* ProcessEventPattern;
 	extern const char* ProcessEventMask;
-	extern const uintptr_t ProcessEventOffset;
 
 	extern const std::string GObjectsString;
 	extern const uint8_t* GObjectsPattern;
@@ -49,4 +54,11 @@ namespace Configuration
 	extern const std::string GameName;
 	extern const std::string GameNameShort;
 	extern const std::string GameVersion;
+	extern const std::filesystem::path GeneratorDirectory;
 }
+
+/*
+# ========================================================================================= #
+#
+# ========================================================================================= #
+*/

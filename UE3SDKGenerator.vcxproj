@@ -142,18 +142,18 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Engine\Engine.cpp" />
-    <ClCompile Include="Engine\Rocket League\Configuration.cpp" />
-    <ClCompile Include="Engine\Rocket League\GameDefines.cpp" />
-    <ClCompile Include="Engine\Rocket League\PiecesOfCode.cpp" />
+    <ClCompile Include="Engine\Template\Configuration.cpp" />
+    <ClCompile Include="Engine\Template\GameDefines.cpp" />
+    <ClCompile Include="Engine\Template\PiecesOfCode.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Printers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.hpp" />
     <ClInclude Include="Engine\Engine.hpp" />
-    <ClInclude Include="Engine\Rocket League\Configuration.hpp" />
-    <ClInclude Include="Engine\Rocket League\GameDefines.hpp" />
-    <ClInclude Include="Engine\Rocket League\PiecesOfCode.hpp" />
+    <ClInclude Include="Engine\Template\Configuration.hpp" />
+    <ClInclude Include="Engine\Template\GameDefines.hpp" />
+    <ClInclude Include="Engine\Template\PiecesOfCode.hpp" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="Printers.hpp" />
   </ItemGroup>

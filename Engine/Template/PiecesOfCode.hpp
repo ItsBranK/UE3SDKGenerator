@@ -7,33 +7,28 @@
 # ========================================================================================= #
 */
 
-// These are global variables, make changes in the cpp file only!
+// These are global variables for the generator, only change them if you know what you're doing!
 
 namespace PiecesOfCode
 {
 	extern const std::string TArray_Iterator;
-	extern const std::string TArray_Struct;
-	extern const std::string FNameEntry_Struct;
-	extern const std::string FName_Struct;
-	extern const std::string FScriptDelegate_Struct;
+	extern const std::string TArray_Class;
+	extern const std::string TMap_Class;
+	extern const std::string FNameEntry_UTF16;
+	extern const std::string FNameEntry_UTF8;
+	extern const std::string FName_UTF16;
+	extern const std::string FName_UTF8;
+	extern const std::string FString_UTF16;
+	extern const std::string FString_UTF8;
 	extern const std::string FPointer_Struct;
 	extern const std::string FQWord_Struct;
-	extern const std::string FString_Struct;
-	extern const std::string UField_Fields;
-	extern const std::string UEnum_Fields;
-	extern const std::string UConst_Fields;
-	extern const std::string UProperty_Fields;
-	extern const std::string UStruct_Fields;
-	extern const std::string UFunction_Fields;
-	extern const std::string UStructProperty_Fields;
-	extern const std::string UObjectProperty_Fields;
-	extern const std::string UMapProperty_Fields;
-	extern const std::string UInterfaceProperty_Fields;
-	extern const std::string UDelegateProperty_Fields;
-	extern const std::string UByteProperty_Fields;
-	extern const std::string UBoolProperty_Fields;
-	extern const std::string UArrayProperty_Fields;
 	extern const std::string UObject_FunctionDescriptions;
 	extern const std::string UObject_Functions;
 	extern const std::string UFunction_Functions;
 }
+
+/*
+# ========================================================================================= #
+#
+# ========================================================================================= #
+*/

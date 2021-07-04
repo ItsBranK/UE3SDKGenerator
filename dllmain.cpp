@@ -279,7 +279,7 @@ namespace Retrievers
             }
             else if (uProperty->IsA(UStrProperty::StaticClass()))
             {
-                propertyType = "struct FString";
+                propertyType = "class FString";
 
                 return EPropertyTypes::TYPE_FSTRING;
             }
@@ -392,6 +392,34 @@ namespace Retrievers
         {
             return EPropertyTypes::TYPE_UNKNOWN;
         }
+    }
+
+    std::string GetFieldType(EPropertyTypes propertyType, EClassTypes classType, bool& foundType)
+    {
+        std::string fieldType;
+
+        if (propertyType != EPropertyTypes::TYPE_UNKNOWN)
+        {
+            foundType = true;
+        }
+        else if (classType != EClassTypes::CLASS_UNKNOWN)
+        {
+            switch (classType)
+            {
+            case EClassTypes::CLASS_UOBJECT:
+                fieldType = "class UObject*";
+                break;
+            case EClassTypes::CLASS_UFIELD:
+                fieldType = "class UField*";
+                break;
+            }
+        }
+        else
+        {
+            foundType = false;
+        }
+
+        return fieldType;
     }
 
     size_t GetPropertySize(UProperty* uProperty)
@@ -515,7 +543,7 @@ namespace StructGenerator
         Generator::LogFile.Write(structName);
         Generator::LogFile.Pad(' ', 75 - (structName.size() + propertyTitle.size()), false);
         Generator::LogFile.Write(" - Instance: ");
-        Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uScriptStruct), static_cast<uint8_t>(Configuration::Alignment));
+        Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uScriptStruct), static_cast<int32_t>(Configuration::Alignment));
         Generator::LogFile.NewLine();
 
         structStream << "// " << structFullName << "\n";
@@ -608,7 +636,7 @@ namespace StructGenerator
             {
                 missedOffset = uProperty->Offset - lastOffset;
 
-                if (missedOffset >= static_cast<uint8_t>(Configuration::Alignment))
+                if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
                 {
                     propertyStream << "UnknownData";
                     Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
@@ -755,7 +783,7 @@ namespace StructGenerator
         {
             missedOffset = uScriptStruct->PropertySize - lastOffset;
 
-            if (missedOffset >= static_cast<uint8_t>(Configuration::Alignment))
+            if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
             {
                 propertyStream << "UnknownData";
                 Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
@@ -882,7 +910,7 @@ namespace ConstGenerator
             Generator::LogFile.Write(constName);
             Generator::LogFile.Pad(' ', 75 - (constName.size() + propertyTitle.size()), false);
             Generator::LogFile.Write(" - Instance: ");
-            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uConst), static_cast<uint8_t>(Configuration::Alignment));
+            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uConst), static_cast<int32_t>(Configuration::Alignment));
             Generator::LogFile.NewLine();
 
             std::string constValue = uConst->Value.ToString();
@@ -944,7 +972,6 @@ namespace EnumGenerator
 
         std::string enumFullName = uEnum->GetFullName();
         std::string enumName = Generator::GenerateValidName(uEnum->GetName());
-        std::string enumOuterName = Generator::GenerateValidName(uEnum->Outer->GetNameCPP());
 
         if (enumName.find("Default__") == std::string::npos)
         {
@@ -954,44 +981,32 @@ namespace EnumGenerator
             Generator::LogFile.Write(enumName);
             Generator::LogFile.Pad(' ', 75 - (enumName.size() + propertyTitle.size()), false);
             Generator::LogFile.Write(" - Instance: ");
-            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uEnum), static_cast<uint8_t>(Configuration::Alignment));
+            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uEnum), static_cast<int32_t>(Configuration::Alignment));
             Generator::LogFile.NewLine();
 
             uint32_t enumCount = UObject::CountObject<UEnum>(uEnum->GetName());
+
+            if (enumCount > 1)
+            {
+                enumName = Generator::GenerateValidName(uEnum->Outer->GetName()) + "_" + enumName;
+            }
 
             if (enumName.find("E") != 0)
             {
                 enumName = "E" + enumName;
             }
 
-            if (enumCount > 1)
+            if (Configuration::UsingEnumClasses)
             {
-                if (Configuration::UsingEnumClasses)
-                {
-                    enumStream << "// " << enumFullName << "\n"
-                        << "enum class " << enumOuterName << "_" << enumName << " : uint8_t\n"
-                        << "{\n";
-                }
-                else
-                {
-                    enumStream << "// " << enumFullName << "\n"
-                        << "enum " << enumOuterName << "_" << enumName << "\n"
-                        << "{\n";
-                }
+                enumStream << "// " << enumFullName << "\n";
+                enumStream << "enum class " << enumName << " : " << Configuration::EnumClassType << "\n";
+                enumStream << "{" << "\n";
             }
             else
             {
-                if (Configuration::UsingEnumClasses)
-                {
-                    enumStream << "// " << enumFullName << "\n"
-                        << "enum class " << enumName << " : uint8_t\n"
-                        << "{\n";
-                }
-                else
-                {
-                    enumStream << "// " << enumFullName << "\n"
-                        << "enum " << enumName << "\n{\n";
-                }
+                enumStream << "// " << enumFullName << "\n";
+                enumStream << "enum " << enumName << "\n";
+                enumStream << "{" << "\n";
             }
 
             std::map<std::string, uint32_t> propertiesMap;
@@ -1025,7 +1040,7 @@ namespace EnumGenerator
 
                 if (i != uEnum->Names.Num() - 1)
                 {
-                    enumStream << ",\n";
+                    enumStream << "," << "\n";
                 }
                 else
                 {
@@ -1063,6 +1078,94 @@ namespace EnumGenerator
 
 namespace ClassGenerator
 {
+    void GenerateFields(std::ostringstream& classStream, class UClass* uClass, EClassTypes classType)
+    {
+        std::ostringstream propertyStream;
+
+        size_t localSize = 0;
+        size_t startOffset = 0;
+        size_t missedOffset = 0;
+        size_t lastOffset = 0;
+
+        std::map<std::uintptr_t, ClassField> fields = Fields::GetOrderedFields(classType, localSize, startOffset);
+
+        if (fields.size() > 0)
+        {
+            if (uClass->PropertySize == localSize)
+            {
+                lastOffset = startOffset;
+                int32_t unknownDataIndex = 0;
+
+                for (const auto& field : fields)
+                {
+                    if ((lastOffset + field.second.Size) < field.second.Offset)
+                    {
+                        missedOffset = field.second.Offset - lastOffset;
+
+                        if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
+                        {
+                            propertyStream << "\tuint8_t UnknownData";
+                            Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
+                            propertyStream << "[";
+                            Printers::MakeHex(propertyStream, missedOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                            propertyStream << "];";
+
+                            classStream << propertyStream.str() << " // ";
+                            Printers::MakeHex(classStream, lastOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                            classStream << " (";
+                            Printers::MakeHex(classStream, missedOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                            classStream << ") DYNAMIC FIELD PADDING\n";
+
+                            Printers::EmptyStream(propertyStream);
+
+                            unknownDataIndex++;
+                        }
+                    }
+
+                    classStream << "\t" << field.second.Type << " // ";
+                    Printers::MakeHex(classStream, field.second.Offset, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                    classStream << " (";
+                    Printers::MakeHex(classStream, field.second.Size, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                    classStream << ")\n";
+
+                    lastOffset = field.second.Offset + field.second.Size;
+                }
+
+                if (lastOffset < uClass->PropertySize)
+                {
+                    missedOffset = uClass->PropertySize - lastOffset;
+
+                    if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
+                    {
+                        propertyStream << "\tuint8_t UnknownData";
+                        Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
+                        propertyStream << "[";
+                        Printers::MakeHex(propertyStream, missedOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+                        propertyStream << "];";
+
+                        classStream << propertyStream.str() << " // ";
+                        Printers::MakeHex(classStream, lastOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                        classStream << " (";
+                        Printers::MakeHex(classStream, missedOffset, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+                        classStream << ") DYNAMIC FIELD PADDING\n";
+                    }
+                }
+            }
+            else
+            {
+                Generator::LogFile.WriteLine("Error: INCORRECT CLASS SIZE DETECTED FOR ECLASSTYPE " + std::to_string(static_cast<int32_t>(classType)));
+                Generator::LogFile.WriteLine("Error: ECLASSTYPE LOCAL SIZE: " + std::to_string(localSize));
+                Generator::LogFile.WriteLine("Error: ECLASSTYPE ACTUAL SIZE: " + std::to_string(uClass->PropertySize));
+                MessageBox(NULL, (LPCWSTR)L"Error: Incorrect class size detected, check the log for more details!", (LPCWSTR)L"UE3SDKGenerator", MB_ICONERROR | MB_OK);
+            }
+        }
+        else
+        {
+            Generator::LogFile.WriteLine("Error: NO FIELDS FOUND FOR ECLASSTYPE " + std::to_string(static_cast<int32_t>(classType)));
+            MessageBox(NULL, (LPCWSTR)L"Error: No fields found, check the log for more details!", (LPCWSTR)L"UE3SDKGenerator", MB_ICONERROR | MB_OK);
+        }
+    }
+
     void GenerateClass(File& file, class UClass* uClass)
     {
         std::ostringstream classStream;
@@ -1085,7 +1188,7 @@ namespace ClassGenerator
         Generator::LogFile.Write(className);
         Generator::LogFile.Pad(' ', 75 - (className.size() + propertyTitle.size()), false);
         Generator::LogFile.Write(" - Instance: ");
-        Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uClass), static_cast<uint8_t>(Configuration::Alignment));
+        Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(uClass), static_cast<int32_t>(Configuration::Alignment));
         Generator::LogFile.NewLine();
 
         std::vector<UProperty*> vProperty;
@@ -1133,20 +1236,20 @@ namespace ClassGenerator
 
         classStream << "\n{\npublic:\n";
 
-        if (uClass == UObject::FindClass("Class Core.Field")) { classStream << PiecesOfCode::UField_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.Enum")) { classStream << PiecesOfCode::UEnum_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.Const")) { classStream << PiecesOfCode::UConst_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.Property")) { classStream << PiecesOfCode::UProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.Struct")) { classStream << PiecesOfCode::UStruct_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.Function")) { classStream << PiecesOfCode::UFunction_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.StructProperty")) { classStream << PiecesOfCode::UStructProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.ObjectProperty")) { classStream << PiecesOfCode::UObjectProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.MapProperty")) { classStream << PiecesOfCode::UMapProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.InterfaceProperty")) { classStream << PiecesOfCode::UInterfaceProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.DelegateProperty")) { classStream << PiecesOfCode::UDelegateProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.ByteProperty")) { classStream << PiecesOfCode::UByteProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.BoolProperty")) { classStream << PiecesOfCode::UBoolProperty_Fields; }
-        else if (uClass == UObject::FindClass("Class Core.ArrayProperty")) { classStream << PiecesOfCode::UArrayProperty_Fields; }
+        if (uClass == UField::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UFIELD); }
+        else if (uClass == UEnum::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UENUM); }
+        else if (uClass == UConst::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UCONST); }
+        else if (uClass == UProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UPROPERTY); }
+        else if (uClass == UStruct::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_USTRUCT); }
+        else if (uClass == UFunction::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UFUNCTION); }
+        else if (uClass == UStructProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_USTRUCTPROPERTY); }
+        else if (uClass == UObjectProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UOBJECTPROPERTY); }
+        else if (uClass == UMapProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UMAPPROPERTY); }
+        else if (uClass == UInterfaceProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UINTERFACEPROPERTY); }
+        else if (uClass == UDelegateProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UDELEGATEPROPERTY); }
+        else if (uClass == UByteProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UBYTEPROPERTY); }
+        else if (uClass == UBoolProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UBOOLPROPERTY); }
+        else if (uClass == UArrayProperty::StaticClass()) { GenerateFields(classStream, uClass, EClassTypes::CLASS_UARRAYPROPERTY); }
         else
         {
             std::map<std::string, uint32_t> propertyNameMap;
@@ -1158,7 +1261,7 @@ namespace ClassGenerator
 
                 std::string propertyName = Generator::GenerateValidName(uProperty->GetName());
 
-                if (uClass == UObject::FindClass("Class Core.Object"))
+                if (uClass == UObject::StaticClass())
                 {
                     if (!Configuration::UsingDetours && propertyName.find("VfTable") != std::string::npos)
                     {
@@ -1171,7 +1274,7 @@ namespace ClassGenerator
                 {
                     missedOffset = uProperty->Offset - lastOffset;
 
-                    if (missedOffset >= static_cast<uint8_t>(Configuration::Alignment))
+                    if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
                     {
                         propertyStream << "UnknownData";
                         Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
@@ -1315,7 +1418,7 @@ namespace ClassGenerator
             {
                 missedOffset = uClass->PropertySize - lastOffset;
 
-                if (missedOffset >= static_cast<uint8_t>(Configuration::Alignment))
+                if (missedOffset >= static_cast<int32_t>(Configuration::Alignment))
                 {
                     propertyStream << "UnknownData";
                     Printers::MakeDecimal(propertyStream, unknownDataIndex, static_cast<uint32_t>(EWidthTypes::WIDTH_BYTE));
@@ -1340,7 +1443,7 @@ namespace ClassGenerator
 
         classStream << "public:\n";
 
-        if (uClass == UObject::FindClass("Class Core.Object"))
+        if (uClass == UObject::StaticClass())
         {
             classStream << PiecesOfCode::UObject_FunctionDescriptions;
         }
@@ -1374,7 +1477,7 @@ namespace ClassGenerator
 
         FunctionGenerator::GenerateFunctionDescription(file, uClass);
 
-        if (uClass == UObject::FindClass("Class Core.Object"))
+        if (uClass == UObject::StaticClass())
         {
             if (Configuration::UsingDetours)
             {
@@ -1385,7 +1488,7 @@ namespace ClassGenerator
                 FunctionGenerator::GenerateVirtualFunctions(file);
             }
         }
-        else if (uClass == UObject::FindClass("Class Core.Function"))
+        else if (uClass == UFunction::StaticClass())
         {
             classStream << "\tstatic UFunction* FindFunction(const std::string& functionFullName);\n";
         }
@@ -1651,7 +1754,6 @@ namespace FunctionGenerator
 {
     void GenerateVirtualFunctions(File& file)
     {
-        uintptr_t f = UObject::StaticClass()->VfTableObject.Dummy;
         uintptr_t processEventAddress = 0x0;
         
         if (!Configuration::UsingOffsets)
@@ -1660,8 +1762,7 @@ namespace FunctionGenerator
         }
         else
         {
-            uintptr_t baseAddress = reinterpret_cast<uintptr_t>(GetModuleHandle(NULL));
-            processEventAddress = baseAddress + Configuration::ProcessEventOffset;
+            processEventAddress = reinterpret_cast<uintptr_t*>(UObject::StaticClass()->VfTableObject.Dummy)[Configuration::ProcessEventIndex];
         }
 
         if (processEventAddress != 0x0)
@@ -1669,21 +1770,21 @@ namespace FunctionGenerator
             file.NewLine();
             file.WriteLine("\t// Virtual Functions\n");
 
-            for (int index = 0; index < 256; index++)
+            for (int32_t index = 0; index < 256; index++)
             {
                 uintptr_t virtualFunction = reinterpret_cast<uintptr_t*>(UObject::StaticClass()->VfTableObject.Dummy)[index];
 
                 if (virtualFunction == processEventAddress)
                 {
                     file.Write("\tvirtual void ProcessEvent(class UFunction* uFunction, void* uParams, void* uResult = nullptr);\t\t\t// ");
-                    file.Hex(virtualFunction, static_cast<uint8_t>(Configuration::Alignment));
+                    file.Hex(virtualFunction, static_cast<int32_t>(Configuration::Alignment));
                     file.NewLine();
                     break;
                 }
                 else
                 {
                     file.Write("\tvirtual void VirtualFunction" + std::to_string(index) + "();\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t// ");
-                    file.Hex(virtualFunction, static_cast<uint8_t>(Configuration::Alignment));
+                    file.Hex(virtualFunction, static_cast<int32_t>(Configuration::Alignment));
                     file.NewLine();
                 }
             }
@@ -1704,14 +1805,14 @@ namespace FunctionGenerator
         static bool objectFunctions = false;
         static bool functionFunctions = false;
 
-        if (!objectFunctions && uClass == UObject::FindClass("Class Core.Object"))
+        if (!objectFunctions && uClass == UObject::StaticClass())
         {
             codeStream << PiecesOfCode::UObject_Functions;
 
             if (Configuration::UsingDetours)
             {
                 codeStream << "template<typename T>\n"
-                << "T GetVFunction(const void* instance, std::size_t index)\n"
+                << "T GetVirtualFunction(const void* instance, std::size_t index)\n"
                 << "{\n"
                 << "\tauto vtable = *static_cast<const void***>(const_cast<void*>(instance));\n"
                 << "\treturn reinterpret_cast<T>(vtable[index]);\n"
@@ -1719,14 +1820,14 @@ namespace FunctionGenerator
 
                 codeStream << "void UObject::ProcessEvent(class UFunction* uFunction, void* uParams, void* uResult = nullptr)\n"
                 << "{\n"
-                << "\tGetVFunction<void(*)(class UObject*, class UFunction*, void*)>(this, " << Configuration::ProcessEventIndex << ")(this, uFunction, uParams);\n"
+                << "\tGetVirtualFunction<void(*)(class UObject*, class UFunction*, void*)>(this, " << Configuration::ProcessEventIndex << ")(this, uFunction, uParams);\n"
                 << "}\n\n";
             }
 
             objectFunctions = true;
         }
 
-        if (!functionFunctions && uClass == UObject::FindClass("Class Core.Function"))
+        if (!functionFunctions && uClass == UFunction::StaticClass())
         {
             codeStream << PiecesOfCode::UFunction_Functions;
 
@@ -2360,7 +2461,7 @@ namespace Generator
         if (Configuration::UsingConstants)
         {
             File file;
-            file.Create(Engine::GeneratorDirectory + "\\" + Configuration::GameNameShort, "SdkConstants.hpp");
+            file.Create(Configuration::GeneratorDirectory / Configuration::GameNameShort, "SdkConstants.hpp");
 
             file.WriteLine("#pragma once");
 
@@ -2397,7 +2498,7 @@ namespace Generator
     void GenerateHeaders()
     {
         File file;
-        file.Create(Engine::GeneratorDirectory + "\\" + Configuration::GameNameShort, "SdkHeaders.hpp");
+        file.Create(Configuration::GeneratorDirectory / Configuration::GameNameShort, "SdkHeaders.hpp");
 
         Printers::PrintHeader(file, "SdkHeaders", "hpp", false);
         file.WriteLine("#pragma once");
@@ -2423,7 +2524,7 @@ namespace Generator
     void GenerateDefines()
     {
         File file;
-        file.Create(Engine::GeneratorDirectory + "\\" + Configuration::GameNameShort, "GameDefines.hpp");
+        file.Create(Configuration::GeneratorDirectory / Configuration::GameNameShort, "GameDefines.hpp");
 
         Printers::PrintHeader(file, "GameDefines", "hpp", false);
 
@@ -2469,7 +2570,8 @@ namespace Generator
         Printers::PrintSection(file, "Defines");
 
         file.Write(PiecesOfCode::TArray_Iterator);
-        file.Write(PiecesOfCode::TArray_Struct);
+        file.Write(PiecesOfCode::TArray_Class);
+        file.Write(PiecesOfCode::TMap_Class);
 
         Printers::PrintSection(file, "Globals");
 
@@ -2478,17 +2580,36 @@ namespace Generator
 
         Printers::PrintSection(file, "Structs");
 
-        file.WriteLine(PiecesOfCode::FNameEntry_Struct);
-        file.WriteLine(PiecesOfCode::FName_Struct);
-        file.WriteLine(PiecesOfCode::FString_Struct);
+#ifdef CHARACTER_UTF16
+        file.WriteLine(PiecesOfCode::FNameEntry_UTF16);
+        file.WriteLine(PiecesOfCode::FName_UTF16);
+        file.WriteLine(PiecesOfCode::FString_UTF16);
+#endif
+
+#ifdef CHARACTER_UTF8
+        file.WriteLine(PiecesOfCode::FNameEntry_UTF8);
+        file.WriteLine(PiecesOfCode::FName_UTF8);
+        file.WriteLine(PiecesOfCode::FString_UTF8);
+#endif
+
+        std::ostringstream stream;
+        stream << "\tuint8_t UnknownData00[";
+        Printers::MakeHex(stream, sizeof(FScriptDelegate), static_cast<uint32_t>(EWidthTypes::WIDTH_NONE));
+        stream << "];";
+
+        file.WriteLine("struct FScriptDelegate\n");
+        file.WriteLine("{");
+        file.WriteLine(stream.str());
+        file.WriteLine("}");
+
         file.WriteLine(PiecesOfCode::FPointer_Struct);
-        file.WriteLine(PiecesOfCode::FScriptDelegate_Struct);
+        file.WriteLine(PiecesOfCode::FQWord_Struct);
 
         Printers::PrintFooter(file, false);
 
         file.Close();
 
-        file.Create(Engine::GeneratorDirectory + "\\" + Configuration::GameNameShort, "GameDefines.cpp");
+        file.Create(Configuration::GeneratorDirectory / Configuration::GameNameShort, "GameDefines.cpp");
 
         Printers::PrintHeader(file, "GameDefines", "cpp", false);
 
@@ -2506,7 +2627,7 @@ namespace Generator
     {
         std::vector<UObject*> vPackages;
 
-        std::string fullDirectory = Engine::GeneratorDirectory + "\\" + Configuration::GameNameShort + "\\SDK_HEADERS";
+        std::filesystem::path fullDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort / "SDK_HEADERS";
 
         for (UObject* uObject : *UObject::GObjObjects())
         {
@@ -2587,11 +2708,10 @@ namespace Generator
 
     void GenerateSDK()
     {
-        std::string directory = Engine::GeneratorDirectory;
-        std::string fullDirectory = directory + "\\" + Configuration::GameNameShort;
-        std::string headerDirectory = fullDirectory + "\\SDK_HEADERS";
+        std::filesystem::path fullDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort;
+        std::filesystem::path headerDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort / "SDK_HEADERS";
 
-        std::filesystem::create_directory(directory);
+        std::filesystem::create_directory(Configuration::GeneratorDirectory);
         std::filesystem::create_directory(fullDirectory);
         std::filesystem::create_directory(headerDirectory);
 
@@ -2636,10 +2756,8 @@ namespace Generator
     {
         Initialize(true);
 
-        std::string directory = Engine::GeneratorDirectory;
-        std::string fullDirectory = directory + "\\" + Configuration::GameNameShort;
-
-        std::filesystem::create_directory(directory);
+        std::filesystem::path fullDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort;
+        std::filesystem::create_directory(Configuration::GeneratorDirectory);
         std::filesystem::create_directory(fullDirectory);
 
         if (std::filesystem::exists(fullDirectory))
@@ -2656,10 +2774,10 @@ namespace Generator
                 file.Create(fullDirectory, "NameDump.txt");
 
                 file.Write("Base: ");
-                file.Hex(baseAddress, static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(baseAddress, static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.Write("GNames: ");
-                file.Hex(reinterpret_cast<uintptr_t>(GNames), static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(reinterpret_cast<uintptr_t>(GNames), static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.NewLine();
 
@@ -2672,7 +2790,7 @@ namespace Generator
                         file.Write(std::to_string(name->GetIndex()));
                         file.Write("] " + name->ToString() + " ");
                         file.Pad(' ', 50 - name->ToString().length(), false);
-                        file.Hex(reinterpret_cast<uintptr_t>(name), static_cast<uint8_t>(Configuration::Alignment));
+                        file.Hex(reinterpret_cast<uintptr_t>(name), static_cast<int32_t>(Configuration::Alignment));
                         file.NewLine();
                     }
                 }
@@ -2686,10 +2804,10 @@ namespace Generator
                 file.Create(fullDirectory, "ObjectDump.txt");
 
                 file.Write("Base: ");
-                file.Hex(baseAddress, static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(baseAddress, static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.Write("GObjects: ");
-                file.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.NewLine();
 
@@ -2704,7 +2822,7 @@ namespace Generator
                         file.Write(std::to_string(uObject->ObjectInternalInteger));
                         file.Write("] " + objectName + " ");
                         file.Pad(' ', 50 - objectName.length(), false);
-                        file.Hex(reinterpret_cast<uintptr_t>(uObject), static_cast<uint8_t>(Configuration::Alignment));
+                        file.Hex(reinterpret_cast<uintptr_t>(uObject), static_cast<int32_t>(Configuration::Alignment));
                         file.NewLine();
                     }
                 }
@@ -2718,10 +2836,10 @@ namespace Generator
                 file.Create(fullDirectory, "FullNameDump.txt");
 
                 file.Write("Base: ");
-                file.Hex(baseAddress, static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(baseAddress, static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.Write("GObjects: ");
-                file.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<uint8_t>(Configuration::Alignment));
+                file.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<int32_t>(Configuration::Alignment));
                 file.NewLine();
                 file.NewLine();
 
@@ -2736,7 +2854,7 @@ namespace Generator
                         file.Write(std::to_string(uObject->ObjectInternalInteger));
                         file.Write("] " + objectFullName + " ");
                         file.Pad(' ', 50 - objectFullName.length(), false);
-                        file.Hex(reinterpret_cast<uintptr_t>(uObject), static_cast<uint8_t>(Configuration::Alignment));
+                        file.Hex(reinterpret_cast<uintptr_t>(uObject), static_cast<int32_t>(Configuration::Alignment));
                         file.NewLine();
                     }
                 }
@@ -2774,32 +2892,56 @@ namespace Generator
                 GNames = reinterpret_cast<TArray<struct FNameEntry*>*>(GNamesAddress);
             }
 
+            UObject::RegVfTableObject();
+            UObject::RegObjectInternalInteger();
+            UObject::RegOuter();
+            UObject::RegName();
+            UObject::RegClass();
+            UField::RegNext();
+            //UField::RegSuperField();              // COMMENT OUT ACCORDINGLY!
+            UEnum::RegNames();
+            UConst::RegValue();
+            UProperty::RegArrayDim();
+            UProperty::RegElementSize();
+            UProperty::RegPropertyFlags();
+            UProperty::RegOffset();
+            UStruct::RegSuperField();               // COMMENT OUT ACCORDINGLY!
+            UStruct::RegChildren();
+            UStruct::RegPropertySize();
+            UFunction::RegFunctionFlags();
+            UFunction::RegiNative();
+            UStructProperty::RegStruct();
+            UObjectProperty::RegPropertyClass();
+            UClassProperty::RegMetaClass();
+            UMapProperty::RegKey();
+            UMapProperty::RegValue();
+            UInterfaceProperty::RegInterfaceClass();
+            UDelegateProperty::RegFunction();
+            UDelegateProperty::RegDelegateName();
+            UByteProperty::RegEnum();
+            UBoolProperty::RegBitMask();
+            UArrayProperty::RegInner();
+
             initialized = true;
         }
 
         if (createLogFile && initialized)
         {
-            //uintptr_t GObjectsOffset = reinterpret_cast<uintptr_t>(GObjects) - baseAddress;
-            //uintptr_t GNamesOffset = reinterpret_cast<uintptr_t>(GNames) - baseAddress;
+            std::filesystem::path fullDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort;
 
-            std::string directory = Engine::GeneratorDirectory;
-            std::string fullDirectory = directory + "\\" + Configuration::GameNameShort;
-
-            std::filesystem::create_directory(directory);
+            std::filesystem::create_directory(Configuration::GeneratorDirectory);
             std::filesystem::create_directory(fullDirectory);
-
-            std::cout << fullDirectory << std::endl;
 
             Generator::LogFile.Create(fullDirectory, "UE3SDKGenerator.log");
 
             Generator::LogFile.Write("Base: ");
-            Generator::LogFile.Hex(baseAddress, static_cast<uint8_t>(Configuration::Alignment));
+            Generator::LogFile.Hex(baseAddress, static_cast<int32_t>(Configuration::Alignment));
             Generator::LogFile.NewLine();
             Generator::LogFile.Write("GObjects: ");
-            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<uint8_t>(Configuration::Alignment));
+            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(GObjects), static_cast<int32_t>(Configuration::Alignment));
             Generator::LogFile.NewLine();
             Generator::LogFile.Write("GNames: ");
-            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(GNames), static_cast<uint8_t>(Configuration::Alignment));
+            Generator::LogFile.Hex(reinterpret_cast<uintptr_t>(GNames), static_cast<int32_t>(Configuration::Alignment));
             Generator::LogFile.NewLine();
         }
     }

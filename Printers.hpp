@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <filesystem>
 
 class File
 {
@@ -11,7 +12,7 @@ private:
 	std::ofstream Stream;
 
 public:
-	File() {}
+	File() { }
 
 	File(const std::string& directory, const std::string& name)
 	{
@@ -34,6 +35,11 @@ public:
 		Stream.open(directory + "\\" + name);
 	}
 
+	void Create(const std::filesystem::path directory, const std::string& name)
+	{
+		Stream.open(directory / name);
+	}
+
 	void Close()
 	{
 		if (IsOpen())
@@ -44,7 +50,7 @@ public:
 
 	void Flush()
 	{
-		Stream << std::flush;
+		Stream.flush();
 	}
 
 	void Write(const std::string& string)
@@ -54,7 +60,7 @@ public:
 
 	void WriteLine(const std::string& string)
 	{
-		Stream << string << "\n";
+		Stream << string << std::endl;
 	}
 
 	void Write(std::ostringstream& stream)
@@ -65,7 +71,7 @@ public:
 
 	void NewLine()
 	{
-		Stream << "\n";
+		Stream << std::endl;
 	}
 
 	void Pad(const char& fill, int32_t size, bool left)

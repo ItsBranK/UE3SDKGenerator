@@ -8,6 +8,8 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <functional>
+#include "Configuration.hpp"
 
 /*
 # ========================================================================================= #
@@ -110,8 +112,74 @@ enum EPropertyFlags
 	CPF_SkipSerialization =					0x0080000000000000	// Property shouldn't be serialized, can still be exported to text.
 };
 
+// Class Types
+enum class EClassTypes : uint8_t
+{
+	CLASS_UNKNOWN =                         0,
+	CLASS_UOBJECT =                         1,
+	CLASS_UFIELD =                          2,
+	CLASS_UENUM =                           3,
+	CLASS_UCONST =                          4,
+	CLASS_UPROPERTY =                       5,
+	CLASS_USTRUCT =                         6,
+	CLASS_UFUNCTION =                       7,
+	CLASS_USCRIPTSTRUCT =                   8,
+	CLASS_USTATE =                          9,
+	CLASS_UCLASS =                          10,
+	CLASS_USTRUCTPROPERTY =                 11,
+	CLASS_USTRPROPERTY =                    12,
+	CLASS_UQWORDPROPERTY =                  13,
+	CLASS_UOBJECTPROPERTY =                 14,
+	CLASS_UCOMPONENTPROPERTY =              15,
+	CLASS_UCLASSPROPERTY =                  16,
+	CLASS_UNAMEPROPERTY =                   17,
+	CLASS_UMAPPROPERTY =                    18,
+	CLASS_UINTPROPERTY =                    19,
+	CLASS_UINTERFACEPROPERTY =              20,
+	CLASS_UFLOATPROPERTY =                  21,
+	CLASS_UDELEGATEPROPERTY =               22,
+	CLASS_UBYTEPROPERTY =                   23,
+	CLASS_UBOOLPROPERTY =                   24,
+	CLASS_UARRAYPROPERTY =                  25
+};
+
+// Field Identifiers
+enum class EFieldIds : uint8_t
+{
+	UNKNOWN =                               0,
+	UOBJECT_VFTABLE =                       1,
+	UOBJECT_INDEX =                         2,
+	UOBJECT_OUTER =                         3,
+	UOBJECT_NAME =                          4,
+	UOBJECT_CLASS =                         5,
+	UFIELD_NEXT =                           6,
+	UFIELD_SUPERFIELD =                     7,
+	UENUM_NAMES =                           8,
+	UCONST_VALUE =                          9,
+	UPROPERTY_DIMENSION =                   10,
+	UPROPERTY_SIZE =                        11,
+	UPROPERTY_FLAGS =                       12,
+	UPROPERTY_OFFSET =                      13,
+	USTRUCT_SUPERFIELD =                    14,
+	USTRUCT_CHILDREN =                      15,
+	USTRUCT_SIZE =                          16,
+	UFUNCTION_FLAGS =                       17,
+	UFUNCTION_NATIVE =                      18,
+	USTRUCTPROPERTY_STRUCT =                19,
+	UOBJECTPROPERTY_PROPERTY =              20,
+	UCLASSPROPERTY_METACLASS =              21,
+	UMAPPROPERTY_KEY =                      22,
+	UMAPPROPERTY_VALUE =                    23,
+	UINTERFACEPROPERTY_CLASS =              24,
+	UDELEGATEPROPERTY_FUNCTION =            25,
+	UDELEGATEPROPERTY_NAME =                26,
+	UBYTEPROPERTY_ENUM =                    27,
+	UBOOLPROPERTY_BITMASK =                 28,
+	UARRAYPROPERTY_INNTER =                 29
+};
+
 // Property Types
-enum class EPropertyTypes : uint8_t
+enum class EPropertyTypes : uint16_t
 {
 	TYPE_UNKNOWN =                          0,
 	TYPE_INT8 =                             1,
@@ -134,14 +202,14 @@ enum class EPropertyTypes : uint8_t
 	TYPE_FSTRING =                          18,
 	TYPE_FSCRIPTDELEGATE =                  19,
 	TYPE_FPOINTER =                         20,
-	TYPE_FSTRUCT =                          21,
-	TYPE_UPOINTER =                         22,
+	TYPE_FSTRUCT =					        21,
+	TYPE_UPOINTER =                         22
 };
 
 // Width Types
-enum class EWidthTypes : uint8_t
+enum class EWidthTypes : uint16_t
 {
-	WIDTH_NONE =                            0,
+	WIDTH_NONE =							0,
 	WIDTH_BYTE =                            2,
 	WIDTH_SIZE =                            4,
 	WIDTH_BITMASK =                         8,
@@ -149,8 +217,14 @@ enum class EWidthTypes : uint8_t
 	WIDTH_PROPERTY =                        16
 };
 
+/*
+# ========================================================================================= #
+# Structs
+# ========================================================================================= #
+*/
+
 template<typename TArray>
-struct TIterator
+class TIterator
 {
 public:
 	using ElementType = typename TArray::ElementType;
@@ -209,6 +283,7 @@ public:
 		return *IteratorData;
 	}
 
+public:
 	bool operator==(const TIterator& other) const
 	{
 		return (IteratorData == other.IteratorData);
@@ -220,10 +295,8 @@ public:
 	}
 };
 
-// TArray
-// (0x0000 - 0x0010)
 template<typename InElementType>
-struct TArray
+class TArray
 {
 public:
 	using ElementType = InElementType;
@@ -270,7 +343,7 @@ public:
 		} 
 	}
 
-	ElementConstReference At(const int32_t index) const
+	ElementConstReference At(int32_t index) const
 	{
 		if (index <= ArrayCount)
 		{
@@ -278,7 +351,7 @@ public:
 		} 
 	}
 
-	ElementReference At(const int32_t index)
+	ElementReference At(int32_t index)
 	{
 		if (index <= ArrayCount)
 		{
@@ -386,17 +459,60 @@ extern TArray<struct FNameEntry*>* GNames;
 
 /*
 # ========================================================================================= #
+# Fields
+# ========================================================================================= #
+*/
+
+class ClassField
+{
+public:
+	EFieldIds Id;
+	std::string Type;
+	std::uintptr_t Offset;
+	size_t Size;
+
+public:
+	ClassField();
+	ClassField(EFieldIds id, size_t size);
+	~ClassField();
+
+public:
+	ClassField operator=(const ClassField& other);
+};
+
+namespace Fields
+{
+	extern std::vector<std::function<void()>> FieldMethods;
+	extern std::map<EFieldIds, std::string> IdToType;
+	extern std::map<EFieldIds, ClassField> GlobalFields;
+
+	std::uintptr_t GetOffset(EFieldIds fieldId);
+	std::map<std::uintptr_t, ClassField> GetOrderedFields(EClassTypes classType, size_t& classSize, size_t& startOffset);
+	void AssertField(const ClassField& classField);
+}
+
+#define REGISTER_FIELD(type, method, id) static void Reg##method(){Fields::AssertField(ClassField(id, sizeof(type)));}
+
+/*
+# ========================================================================================= #
 # Structs
 # ========================================================================================= #
 */
 
+// FNameEntry
+// (0x0000 - 0x000C)
 struct FNameEntry
 {
 public:
-	int64_t			Flags;										// 0x0000 (0x08)
+	uint64_t		Flags;										// 0x0000 (0x08)
 	int32_t			Index;										// 0x0008 (0x04)
-	wchar_t			Name[0x400];								// 0x0018 (0x00) // Will either be char, or wchar_t depending on the game.
-	//char			Name[0x400];								// 0x0018 (0x00)
+
+#ifdef CHARACTER_UTF16
+	wchar_t			Name[0x400];								// 0x000C (0x00)
+#endif
+#ifdef CHARACTER_UTF8
+	char			Name[0x400];								// 0x000C (0x00)
+#endif
 
 public:
 	int32_t GetIndex() const
@@ -404,41 +520,53 @@ public:
 		return Index;
 	}
 
+#ifdef CHARACTER_UTF16
 	std::string ToString() const
 	{
 		std::wstring ws(Name);
 		std::string str(ws.begin(), ws.end());
 		return str;
 	}
+#endif
 
-	//std::string ToString() const
-	//{
-	//	return Name; // Does this mean it's not null terminated?
-	//}
+#ifdef CHARACTER_UTF8
+	std::string ToString() const
+	{
+		return std::string(Name);
+	}
+#endif
 
+#ifdef CHARACTER_UTF16
 	const wchar_t* GetWideName() const
 	{
 		return Name;
 	}
+#endif
 
-	//const char* GetAnsiName() const
-	//{
-	//	return Name;
-	//}
+#ifdef CHARACTER_UTF8
+	const char* GetAnsiName() const
+	{
+		return Name;
+	}
+#endif
 };
-
 
 // FName
 // (0x0000 - 0x0008)
 struct FName
 {
 public:
-	using ElementType = const wchar_t; // Will either be const char, or const wchar_t depending on the game.
+#ifdef CHARACTER_UTF16
+	using ElementType = const wchar_t;
+#endif
+#ifdef CHARACTER_UTF8
+	using ElementType = const char;
+#endif
 	using ElementPointer = ElementType*;
 
 private:
-	int32_t	FNameEntryId;
-	int32_t	InstanceNumber;
+	int32_t			FNameEntryId;									// 0x0000 (0x04)
+	int32_t			InstanceNumber;									// 0x0004 (0x04)
 
 public:
 	FName()
@@ -447,13 +575,14 @@ public:
 		InstanceNumber = 0;
 	}
 
-	FName(const int32_t& i)
+	FName(const int32_t id)
 	{
-		FNameEntryId = i;
+		FNameEntryId = id;
 		InstanceNumber = 0;
 	}
 
-	FName(ElementPointer nameToFind)
+#ifdef CHARACTER_UTF16
+	FName(const ElementPointer nameToFind)
 	{
 		static std::vector<int32_t> nameCache{};
 
@@ -484,11 +613,46 @@ public:
 			}
 		}
 	}
+#endif
 
-	~FName() {}
+#ifdef CHARACTER_UTF8
+	FName(ElementPointer nameToFind)
+	{
+		static std::vector<int32_t> nameCache{};
+
+		FNameEntryId = 0;
+		InstanceNumber = 0;
+
+		for (int32_t entryId : nameCache)
+		{
+			if (Names()->At(entryId))
+			{
+				if (!strcmp(Names()->At(entryId)->Name, nameToFind))
+				{
+					FNameEntryId = entryId;
+					return;
+				}
+			}
+		}
+
+		for (int32_t i = 0; i < Names()->Num(); i++)
+		{
+			if (Names()->At(i))
+			{
+				if (!strcmp(Names()->At(i)->Name, nameToFind))
+				{
+					nameCache.push_back(i);
+					FNameEntryId = i;
+				}
+			}
+		}
+	}
+#endif
+
+	~FName() { }
 
 public:
-	static struct TArray<struct FNameEntry*>* Names()
+	static class TArray<struct FNameEntry*>* Names()
 	{
 		TArray<FNameEntry*>* GNamesArray = reinterpret_cast<TArray<FNameEntry*>*>(GNames);
 		return GNamesArray;
@@ -505,6 +669,8 @@ public:
 		{
 			return *Names()->At(FNameEntryId);
 		}
+
+		return FNameEntry();
 	}
 
 	struct FNameEntry* GetEntry()
@@ -513,6 +679,8 @@ public:
 		{
 			return Names()->At(FNameEntryId);
 		}
+
+		return nullptr;
 	}
 
 	int32_t GetNumber() const
@@ -520,7 +688,7 @@ public:
 		return InstanceNumber;
 	}
 
-	void SetNumber(const int32_t& newNumber)
+	void SetNumber(int32_t newNumber)
 	{
 		InstanceNumber = newNumber;
 	}
@@ -565,19 +733,22 @@ public:
 };
 
 // FString
-// (0x0000 - 0x0008)
-// FString
 // (0x0000 - 0x0010)
-struct FString
+class FString
 {
 public:
+#ifdef CHARACTER_UTF16
 	using ElementType = const wchar_t;
+#endif
+#ifdef CHARACTER_UTF8
+	using ElementType = const char;
+#endif
 	using ElementPointer = ElementType*;
 
 private:
-	ElementPointer ArrayData;
-	int32_t ArrayCount;
-	int32_t ArrayMax;
+	ElementPointer	ArrayData;										// 0x0000 (0x08)
+	int32_t			ArrayCount;										// 0x0008 (0x04)
+	int32_t			ArrayMax;										// 0x000C (0x04)
 
 public:
 	FString()
@@ -587,6 +758,7 @@ public:
 		ArrayMax = 0;
 	}
 
+#ifdef CHARACTER_UTF16
 	FString(ElementPointer other)
 	{
 		ArrayData = nullptr;
@@ -600,10 +772,28 @@ public:
 			ArrayData = other;
 		}
 	}
+#endif
+
+#ifdef CHARACTER_UTF8
+	FString(ElementPointer other)
+	{
+		ArrayData = nullptr;
+		ArrayCount = 0;
+		ArrayMax = 0;
+
+		ArrayMax = ArrayCount = *other ? (strlen(other) + 1) : 0;
+
+		if (ArrayCount > 0)
+		{
+			ArrayData = other;
+		}
+	}
+#endif
 
 	~FString() { }
 
 public:
+#ifdef CHARACTER_UTF16
 	std::string ToString() const
 	{
 		if (IsValid())
@@ -615,12 +805,26 @@ public:
 
 		return std::string("null");
 	}
+#endif
+
+#ifdef CHARACTER_UTF8
+	std::string ToString() const
+	{
+		if (IsValid())
+		{
+			return std::string(ArrayData);
+		}
+
+		return std::string("null");
+	}
+#endif
 
 	bool IsValid() const
 	{
 		return !!ArrayData;
 	}
 
+#ifdef CHARACTER_UTF16
 	FString operator=(ElementPointer other)
 	{
 		if (ArrayData != other)
@@ -635,8 +839,27 @@ public:
 
 		return *this;
 	}
+#endif
+
+#ifdef CHARACTER_UTF8
+	FString operator=(ElementPointer other)
+	{
+		if (ArrayData != other)
+		{
+			ArrayMax = ArrayCount = *other ? (strlen(other) + 1) : 0;
+
+			if (ArrayCount > 0)
+			{
+				ArrayData = other;
+			}
+		}
+
+		return *this;
+	}
+#endif
 
 public:
+#ifdef CHARACTER_UTF16
 	bool operator==(const FString& other)
 	{
 		return (!wcscmp(ArrayData, other.ArrayData));
@@ -646,11 +869,26 @@ public:
 	{
 		return (wcscmp(ArrayData, other.ArrayData));
 	}
+#endif
+
+#ifdef CHARACTER_UTF8
+	bool operator==(const FString& other)
+	{
+		return (!strcmp(ArrayData, other.ArrayData));
+	}
+
+	bool operator!=(const FString& other)
+	{
+		return (strcmp(ArrayData, other.ArrayData));
+	}
+#endif
 };
 
+// FScriptDelegate [This struct is game dependent, don't forget to reverse its contents or just its size!]
+// (0x0000 - 0x0008)
 struct FScriptDelegate
 {
-	uint8_t UnknownData00[0x1];
+	class UObject*		Object;										// 0x0000 (0x08)
 };
 
 struct FPointer
@@ -660,7 +898,7 @@ struct FPointer
 
 struct FQWord
 {
-	int32_t A;
+	int32_t	A;
 	int32_t B;
 };
 
@@ -671,11 +909,17 @@ struct FQWord
 */
 
 // Class Core.Object
-// (0x0000 - 0x0000)
+// (0x0000 - 0x0034)
 class UObject
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	struct FPointer VfTableObject;		REGISTER_FIELD(FPointer, VfTableObject, EFieldIds::UOBJECT_VFTABLE)				// 0x0000 (0x08)
+	uint8_t UnknownData00[0x10];		// Example of padding, you do not need to register this as because offsets are all automatically calculated.
+	int32_t ObjectInternalInteger;		REGISTER_FIELD(int32_t, ObjectInternalInteger, EFieldIds::UOBJECT_INDEX)		// 0x0018 (0x04)
+	class UObject* Outer;				REGISTER_FIELD(class UObject*,Outer, EFieldIds::UOBJECT_OUTER)					// 0x001C (0x08)
+	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UOBJECT_NAME)							// 0x0024 (0x08)
+	class UClass* Class;				REGISTER_FIELD(class UClass*, Class, EFieldIds::UOBJECT_CLASS)					// 0x002C (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -687,7 +931,7 @@ public:
 		}
 
 		return uClassPointer;
-	};
+	}
 
 	static TArray<class UObject*>* GObjObjects();
 
@@ -696,9 +940,7 @@ public:
 	std::string GetFullName();
 	std::string GetPackageName();
 	class UObject* GetPackageObj();
-
-	template<typename T>
-	static T* FindObject(const std::string& objectFullName)
+	template<typename T> static T* FindObject(const std::string& objectFullName)
 	{
 		for (UObject* uObject : *UObject::GObjObjects())
 		{
@@ -713,9 +955,7 @@ public:
 
 		return nullptr;
 	}
-
-	template<typename T>
-	static uint32_t CountObject(const std::string& objectName)
+	template<typename T> static uint32_t CountObject(const std::string& objectName)
 	{
 		static std::map<std::string, int32_t> countCache;
 
@@ -737,19 +977,19 @@ public:
 
 		return countCache[objectName];
 	}
-
 	static class UClass* FindClass(const std::string& classFullName);
-
 	bool IsA(class UClass* uClass);
 	bool IsA(int objInternalInteger);
 };
 
  //Class Core.Field
-// (0x0000 - 0x0000)
+// 0x0010 (0x0034 - 0x0044)
 class UField : public UObject
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	class UField* Next;					REGISTER_FIELD(class UField*, Next, EFieldIds::UFIELD_NEXT)						// 0x0034 (0x08)
+	class UField* SuperField;			REGISTER_FIELD(class UField*, SuperField, EFieldIds::UFIELD_SUPERFIELD)			// 0x003C (0x08) [SUPERFIELD CAN EITHER BE HERE, OR IN USTRUCT DPENDING ON THE GAME. COMMENT OUT ACCORDINGLY!]
+
 public:
 	static UClass* StaticClass()
 	{
@@ -765,11 +1005,12 @@ public:
 };
 
 // Class Core.Enum
-// (0x0000 - 0x0000)
+// 0x0010 (0x0044 - 0x0054)
 class UEnum : public UField
 {
 public:
-	TArray<FName>		Names;									// 0x0000 (0x0C)
+	TArray<struct FName> Names;			REGISTER_FIELD(TArray<struct FName>, Names, EFieldIds::UENUM_NAMES)				// 0x0044 (0x10)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -785,11 +1026,12 @@ public:
 };
 
 // Class Core.Const
-// (0x0000 - 0x0000)
+// 0x0010 (0x0044 - 0x0054)
 class UConst : public UField
 {
 public:
-	struct FString		Value;									// 0x0000 (0x10)
+	class FString Value;				REGISTER_FIELD(FString, Value, EFieldIds::UCONST_VALUE)							// 0x0044 (0x10)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -805,11 +1047,15 @@ public:
 };
 
 // Class Core.Property
-// 0x0000 (0x0000 - 0x0000)
+// 0x0014 (0x0044 - 0x0058)
 class UProperty : public UField
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	unsigned long ArrayDim;				REGISTER_FIELD(unsigned long, ArrayDim, EFieldIds::UPROPERTY_DIMENSION)			// 0x0044 (0x04)
+	unsigned long ElementSize;			REGISTER_FIELD(unsigned long, ElementSize, EFieldIds::UPROPERTY_SIZE)			// 0x0048 (0x04)
+	uint64_t PropertyFlags;				REGISTER_FIELD(unsigned long, PropertyFlags, EFieldIds::UPROPERTY_FLAGS)		// 0x004C (0x08)
+	unsigned long Offset;				REGISTER_FIELD(unsigned long, Offset, EFieldIds::UPROPERTY_OFFSET)				// 0x0054 (0x04)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -825,11 +1071,14 @@ public:
 };
 
 // Class Core.Struct
-// 0x0000 (0x0000 - 0x0000)
+// 0x0014 (0x0044 - 0x0058)
 class UStruct : public UField
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	//class UField* SuperField;			REGISTER_FIELD(class UField*, SuperField, EFieldIds::USTRUCT_SUPERFIELD)		// 0x0044 (0x08) [SUPERFIELD CAN EITHER BE HERE, OR IN UFIELD DPENDING ON THE GAME. COMMENT OUT ACCORDINGLY!]
+	class UField* Children;				REGISTER_FIELD(class UField*, Children, EFieldIds::USTRUCT_CHILDREN)			// 0x004C (0x08)
+	unsigned long PropertySize;			REGISTER_FIELD(unsigned long, PropertySize, EFieldIds::USTRUCT_SIZE)			// 0x0054 (0x04)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -845,11 +1094,13 @@ public:
 };
 
 // Class Core.Function
-// 0x0000 (0x0000 - 0x0000)
+// 0x000A (0x0058 - 0x0062)
 class UFunction : public UStruct
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	uint64_t FunctionFlags;				REGISTER_FIELD(uint64_t, FunctionFlags, EFieldIds::UFUNCTION_FLAGS)				// 0x0058 (0x08)
+	uint16_t iNative;					REGISTER_FIELD(uint16_t, iNative, EFieldIds::UFUNCTION_NATIVE)					// 0x0060 (0x02)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -867,11 +1118,11 @@ public:
 };
 
 // Class Core.ScriptStruct
-// 0x0000 (0x0000 - 0x0000)
+// 0x0001 (0x0058 - 0x0059)
 class UScriptStruct : public UStruct
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	uint8_t UnknownData00[0x01]; // 0x0058 (0x01) [USE THIS CLASSES PROPERTYSIZE IN RECLASS TO DETERMINE THE SIZE OF THE UNKNOWNDATA]
 public:
 	static UClass* StaticClass()
 	{
@@ -887,11 +1138,11 @@ public:
 };
 
 // Class Core.State
-// 0x0060 (0x0130 - 0x0190)
+// 0x0001 (0x0058 - 0x0059)
 class UState : public UStruct
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	uint8_t UnknownData00[0x01]; // 0x0058 (0x01) [USE THIS CLASSES PROPERTYSIZE IN RECLASS TO DETERMINE THE SIZE OF THE UNKNOWNDATA]
 public:
 	static UClass* StaticClass()
 	{
@@ -907,11 +1158,11 @@ public:
 };
 
 // Class Core.Class
-// 0x0228 (0x0190 - 0x03B8)
+// 0x0001 (0x0058 - 0x0059)
 class UClass : public UState
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	uint8_t UnknownData00[0x01]; // 0x0058 (0x00) [USE THIS CLASSES PROPERTYSIZE IN RECLASS TO DETERMINE THE SIZE OF THE UNKNOWNDATA]
 public:
 	static UClass* StaticClass()
 	{
@@ -933,11 +1184,12 @@ public:
 */
 
  //Class Core.StructProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UStructProperty : public UProperty
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	class UStruct* Struct;				REGISTER_FIELD(class UStruct*, Struct, EFieldIds::USTRUCTPROPERTY_STRUCT)				// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -953,7 +1205,7 @@ public:
 };
 
 // Class Core.StrProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0000 (0x0058 - 0x0058)
 class UStrProperty : public UProperty
 {
 public:
@@ -972,7 +1224,7 @@ public:
 };
 
 // Class Core.QWordProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0000 (0x0058 - 0x0058)
 class UQWordProperty : public UProperty
 {
 public:
@@ -991,11 +1243,12 @@ public:
 };
 
 // Class Core.ObjectProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UObjectProperty : public UProperty
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	class UClass* PropertyClass;		REGISTER_FIELD(class UClass*, PropertyClass, EFieldIds::UOBJECTPROPERTY_PROPERTY)		// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1011,7 +1264,7 @@ public:
 };
 
 // Class Core.ComponentProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0000 (0x0058 - 0x0058)
 class UComponentProperty : public UObjectProperty
 {
 public:
@@ -1030,11 +1283,12 @@ public:
 };
 
 // Class Core.ClassProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UClassProperty : public UObjectProperty
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	class UClass* MetaClass;			REGISTER_FIELD(class UClass*, MetaClass, EFieldIds::UCLASSPROPERTY_METACLASS)			// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1050,7 +1304,7 @@ public:
 };
 
 // Class Core.NameProperty
-// 0x00C8 (0x0000 - 0x0000)
+// 0x0000 (0x0058 - 0x0000)
 class UNameProperty : public UProperty
 {
 public:
@@ -1069,12 +1323,13 @@ public:
 };
 
 // Class Core.MapProperty
-// 0x0010 (0x0000 - 0x0000)
+// 0x0010 (0x0058 - 0x0068)
 class UMapProperty : public UProperty
 {
 public:
-	class UProperty*	Key;									// 0x00C8 (0x08)
-	class UProperty*	Value;									// 0x00D0 (0x08)
+	class UProperty* Key;				REGISTER_FIELD(class UProperty*, Key, EFieldIds::UMAPPROPERTY_KEY)						// 0x0058 (0x08)
+	class UProperty* Value;				REGISTER_FIELD(class UProperty*, Value, EFieldIds::UMAPPROPERTY_VALUE)					// 0x0060 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1090,7 +1345,7 @@ public:
 };
 
 // Class Core.IntProperty
-//  0x00C8 (0x00C8 - 0x00C8)
+// 0x0000 (0x0058 - 0x0058)
 class UIntProperty : public UProperty
 {
 public:
@@ -1109,11 +1364,12 @@ public:
 };
 
 // Class Core.InterfaceProperty
-// 0x0008 (0x00C8 - 0x00D0)
+// 0x0008 (0x0058 - 0x0060)
 class UInterfaceProperty : public UProperty
 {
 public:
-	class UClass*		InterfaceClass;							// 0x00C8 (0x08)
+	class UClass* InterfaceClass;		REGISTER_FIELD(class UClass*, InterfaceClass, EFieldIds::UINTERFACEPROPERTY_CLASS)		// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1129,7 +1385,7 @@ public:
 };
 
 // Class Core.FloatProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0000 (0x0058 - 0x0058)
 class UFloatProperty : public UProperty
 {
 public:
@@ -1148,11 +1404,13 @@ public:
 };
 
 // Class Core.DelegateProperty
-// 0x0000 (0x0000 - 0x0000)
+// 0x0010 (0x0058 - 0x0068)
 class UDelegateProperty : public UProperty
 {
 public:
-	uint8_t				UnknownData00[0x00];					// 0x0000 (0x00)
+	class UFuncton* Function;			REGISTER_FIELD(class UFuncton*, Function, EFieldIds::UDELEGATEPROPERTY_FUNCTION)		// 0x0058 (0x08)
+	struct FName DelegateName;			REGISTER_FIELD(FName, DelegateName, EFieldIds::UDELEGATEPROPERTY_NAME)					// 0x0060 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1168,11 +1426,12 @@ public:
 };
 
 // Class Core.ByteProperty
-// 0x0008 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UByteProperty : public UProperty
 {
 public:
-	class UEnum*		Enum;									// 0x00C8 (0x08)
+	class UEnum* Enum;					REGISTER_FIELD(class UEnum*, Enum, EFieldIds::UBYTEPROPERTY_ENUM)						// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1188,11 +1447,12 @@ public:
 };
 
 // Class Core.BoolProperty
-// 0x0008 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UBoolProperty : public UProperty
 {
 public:
-	uint64_t			BitMask;								// 0x00C8 (0x08)
+	uint64_t BitMask;					REGISTER_FIELD(uint64_t, BitMask, EFieldIds::UBOOLPROPERTY_BITMASK)						// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{
@@ -1208,11 +1468,12 @@ public:
 };
 
 // Class Core.ArrayProperty
-// 0x0008 (0x0000 - 0x0000)
+// 0x0008 (0x0058 - 0x0060)
 class UArrayProperty : public UProperty
 {
 public:
-	class UProperty*	Inner;									// 0x00C8 (0x08)
+	class UProperty* Inner;				REGISTER_FIELD(class UProperty*, Inner, EFieldIds::UARRAYPROPERTY_INNTER)				// 0x0058 (0x08)
+
 public:
 	static UClass* StaticClass()
 	{

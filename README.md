@@ -1,4 +1,4 @@
-# UE3SDKGenerator v2.1.4
+# UE3SDKGenerator v2.1.5
 
 ### About
 
@@ -36,7 +36,13 @@ Customize the spacing for comments, constants, structs, enums, functions, classe
 
 ### Configuration
 
-To get started in generating an sdk, copy  and paste the `Template` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.hpp` file will need to be reversed by hand for each game that you want to use, as well as the strings in the `PiecesOfCode.cpp` file.
+To get started in generating an sdk, copy  and paste the `Template` folder included in the Engine folder and rename it to the game you would like to use. The `GameDefines.hpp` file will need to be reversed by hand for each game that you want to use.
+
+Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, you do NOT need to register any kind of padding or any field that is NOT in the `EFieldIds` enum. The offsets and sizes will all be dynamically calculated after the fact.
+
+Here is an example of how to register fields, there are more examples in the `Template` folder, there are comments throughout to help you if you encounter any errors with the template.
+
+![](https://i.imgur.com/Y3RaCog.png)
 
 Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file and make sure you have the right files included for your game in `Engine.hpp`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
 
