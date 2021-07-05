@@ -40,7 +40,7 @@ To get started in generating an sdk, copy  and paste the `Template` folder inclu
 
 ![](https://i.imgur.com/gbIfB3R.png)
 
-Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, the template includes all fields needed for sdk generation; anything fields other than that you do NOT need to register as long as it's not part of the `EFieldIds` enum.
+Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, the template includes all fields needed for sdk generation; anything other than that you do NOT need to register as long as it's not part of the `EFieldIds` enum.
 
 Here is an example of how to register fields, there are more examples in the `Template` folder, as well as comments throughout to help you if you encounter any errors with the template.
 
