@@ -1056,7 +1056,7 @@ class UObject
 {
 public:
 	struct FPointer VfTableObject;		REGISTER_FIELD(FPointer, VfTableObject, EFieldIds::UOBJECT_VFTABLE)				// 0x0000 (0x08)
-	uint8_t UnknownData00[0x10];		// Example of padding, you do not need to register this as because offsets are all automatically calculated.
+	uint8_t UnknownData00[0x10];		// Example of padding, you do not need to register this because offsets are all automatically calculated.
 	int32_t ObjectInternalInteger;		REGISTER_FIELD(int32_t, ObjectInternalInteger, EFieldIds::UOBJECT_INDEX)		// 0x0018 (0x04)
 	class UObject* Outer;				REGISTER_FIELD(class UObject*,Outer, EFieldIds::UOBJECT_OUTER)					// 0x001C (0x08)
 	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UOBJECT_NAME)							// 0x0024 (0x08)
