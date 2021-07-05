@@ -46,7 +46,7 @@ Here is an example of how to register fields, there are more examples in the `Te
 
 ![](https://i.imgur.com/Y3RaCog.png)
 
-Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` (don't forget to set the GeneratorDirectory path) file and make sure you have the right files included for your game in `Engine.hpp`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
+Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file (don't forget to set the GeneratorDirectory path) and make sure you have the right files included for your game in `Engine.hpp`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
 
 ### Finalization
 
