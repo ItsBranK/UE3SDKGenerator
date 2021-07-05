@@ -44,7 +44,7 @@ Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sd
 
 Here is an example of how to register fields, there are more examples in the `Template` folder, as well as comments throughout to help you if you encounter any errors with the template.
 
-![](https://i.imgur.com/Y3RaCog.png)
+![](https://i.imgur.com/qbTOPWd.png)
 
 Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file (don't forget to set the GeneratorDirectory path) and make sure you have the right files included for your game in `Engine.hpp`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
 
