@@ -40,13 +40,13 @@ To get started in generating an sdk, copy  and paste the `Template` folder inclu
 
 ![](https://i.imgur.com/gbIfB3R.png)
 
-Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, you do NOT need to register any kind of padding or any field that is NOT in the `EFieldIds` enum. The offsets and sizes will all be dynamically calculated after the fact.
+Hard coded fields in `GameDefines.hpp` are dynamically generated in the final sdk, along with their offsets. In order for the offsets to be correct you must property "register" the field, the template includes all fields needed for sdk generation; anything fields other than that you do NOT need to register as long as it's not part of the `EFieldIds` enum.
 
 Here is an example of how to register fields, there are more examples in the `Template` folder, as well as comments throughout to help you if you encounter any errors with the template.
 
 ![](https://i.imgur.com/qbTOPWd.png)
 
-Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file (don't forget to set the GeneratorDirectory path) and make sure you have the right files included for your game in `Engine.hpp`. When you inject compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
+Once you have the necessary classes filled out all that's left to do is make the desired changes in the `Configuration.cpp` file (don't forget to set the GeneratorDirectory path) and make sure you have the right files included for your game in `Engine.hpp`. When you inject the compiled dll into your game you will be prompted with a message saying that sdk generation has started, do not close your game until you recieve another message confirming generation is completed.
 
 ### Finalization
 
