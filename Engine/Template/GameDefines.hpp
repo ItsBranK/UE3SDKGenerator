@@ -448,6 +448,148 @@ private:
 	}
 };
 
+// THIS CLASS CAN BE GAME SPECIFIC, MOST GAMES WILL GENERATE A STRUCT MIRROR; JUST PASTE THE FIELDS HERE IF SO.
+template<typename TKey, typename TValue>
+class TMap
+{
+private:
+	class TPair
+	{
+		TKey Key;
+		TValue Value;
+		int32_t* HashNext;
+	};
+
+public:
+	using ElementType = TPair;
+	using ElementPointer = ElementType*;
+	using ElementReference = ElementType&;
+	using ElementConstReference = const ElementType&;
+	using Iterator = TIterator<TMap<TKey, TValue>>;
+
+public:
+	ElementPointer ElementData;				// 0x0000 (0x0008)
+	int32_t ElementCount;					// 0x0008 (0x0004)
+	int32_t ElementMax;						// 0x000C (0x0004)
+	std::uintptr_t IndirectData;            // 0x0010 (0x0008)
+	int32_t InlineData[0x4];                // 0x0018 (0x0010)
+	int32_t NumBits;                        // 0x0028 (0x0004)
+	int32_t MaxBits;                        // 0x002C (0x0004)
+	int32_t FirstFreeIndex;                 // 0x0030 (0x0004)
+	int32_t NumFreeIndices;                 // 0x0034 (0x0004)
+	int64_t InlineHash;                     // 0x0038 (0x0008)
+	int32_t* Hash;                          // 0x0040 (0x0008)
+	int32_t HashCount;                      // 0x0048 (0x0004)
+
+public:
+	TMap()
+	{
+		ElementData = nullptr;
+		ElementCount = 0;
+		ElementMax = 0;
+		IndirectData = NULL;
+		NumBits = 0;
+		MaxBits = 0;
+		FirstFreeIndex = 0;
+		NumFreeIndices = 0;
+		InlineHash = 0;
+		Hash = nullptr;
+		HashCount = 0;
+	}
+
+	TMap(struct FMap_Mirror& fMap)
+	{
+		*this = *reinterpret_cast<TMap<TKey, TValue>*>(&fMap);
+	}
+
+	~TMap() { }
+
+public:
+	ElementConstReference operator[](const int32_t index) const
+	{
+		if (index <= ElementCount)
+		{
+			return ElementData[index];
+		}
+	}
+
+	ElementReference operator[](const int32_t index)
+	{
+		if (index <= ElementCount)
+		{
+			return ElementData[index];
+		}
+	}
+
+	const TValue& operator[](const TKey key) const
+	{
+		for (int32_t i = 0; i < Num(); i++)
+		{
+			const TPair& pair = ElementData[i];
+
+			if (pair.Key == key)
+			{
+				return pair.Value;
+			}
+		}
+	}
+
+	TValue& operator[](const TKey key)
+	{
+		for (int32_t i = 0; i < Num(); i++)
+		{
+			TPair& pair = ElementData[i];
+
+			if (pair.Key == key)
+			{
+				return pair.Value;
+			}
+		}
+	}
+
+	TMap<TKey, TValue> operator=(const struct FMap_Mirror& fMap)
+	{
+		*this = *reinterpret_cast<TMap<TKey, TValue>*>(&fMap);
+		return *this;
+	}
+
+	ElementConstReference At(const int32_t index) const
+	{
+		if (index <= ElementCount)
+		{
+			return ElementData[index];
+		}
+	}
+
+	ElementReference At(const int32_t index)
+	{
+		if (index <= ElementCount)
+		{
+			return ElementData[index];
+		}
+	}
+
+	int32_t Num() const
+	{
+		return ElementCount;
+	}
+
+	int32_t Max() const
+	{
+		return ElementMax;
+	}
+
+	Iterator begin()
+	{
+		return Iterator(ElementData);
+	}
+
+	Iterator end()
+	{
+		return Iterator(ElementData + ElementCount);
+	}
+};
+
 /*
 # ========================================================================================= #
 # Globals
