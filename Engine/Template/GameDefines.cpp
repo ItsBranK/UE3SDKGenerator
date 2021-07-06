@@ -88,8 +88,8 @@ namespace Fields
 			return offsetof(UObject, Class);
 		case EFieldIds::UFIELD_NEXT:
 			return offsetof(UField, Next);
-		case EFieldIds::UFIELD_SUPERFIELD: // COMMENT OUT ACCORDINGLY!
-			//return offsetof(UField, SuperField);
+		case EFieldIds::UFIELD_SUPERFIELD:
+			return offsetof(UStruct, SuperField);
 		case EFieldIds::UENUM_NAMES:
 			return offsetof(UEnum, Names);
 		case EFieldIds::UCONST_VALUE:
@@ -102,7 +102,7 @@ namespace Fields
 			return offsetof(UProperty, PropertyFlags);
 		case EFieldIds::UPROPERTY_OFFSET:
 			return offsetof(UProperty, Offset);
-		case EFieldIds::USTRUCT_SUPERFIELD: // COMMENT OUT ACCORDINGLY!
+		case EFieldIds::USTRUCT_SUPERFIELD:
 			return offsetof(UStruct, SuperField);
 		case EFieldIds::USTRUCT_CHILDREN:
 			return offsetof(UStruct, Children);

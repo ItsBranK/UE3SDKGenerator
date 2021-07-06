@@ -1,6 +1,11 @@
 #pragma once
 
 /*
+	Changes in v2.1.6:
+	- Added some safety/null checks for class fields.
+	- Changed the AreGObjectsValid check to support a wider range of games.
+	- You no longer need to comment out returning the offsetof in "GameDefines.cpp" for the class fields.
+ 
 	(This is a major update for the generator, please read the new information in the README file in the repository as well as the comments/examples in the "Template" folder!)
 	Changes in v2.1.5:
 	- Remade the "Template" engine classes to include all classes that are required for generation.

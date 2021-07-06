@@ -48,7 +48,7 @@ namespace Utils
         return NULL;
     }
 
-    bool MapExists(std::multimap<std::string, std::string>& map, std::string& key, std::string& value)
+    bool MapExists(std::multimap<std::string, std::string>& map, const std::string& key, const std::string& value)
     {
         std::pair<std::multimap<std::string, std::string>::iterator, std::multimap<std::string, std::string>::iterator> prRange;
         prRange = map.equal_range(key);
@@ -129,10 +129,7 @@ namespace Utils
     {
         if (UObject::GObjObjects()->Num() > 0 && UObject::GObjObjects()->Max() > UObject::GObjObjects()->Num())
         {
-            if (UObject::GObjObjects()->At(0)->GetFullName() == "Class Core.Config_ORS")
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -264,47 +261,64 @@ namespace Retrievers
         {
             if (uProperty->IsA(UStructProperty::StaticClass()))
             {
-                uint32_t propertyCount = UObject::CountObject<UScriptStruct>(reinterpret_cast<UStructProperty*>(uProperty)->Struct->GetName());
+                UStructProperty* structProperty = reinterpret_cast<UStructProperty*>(uProperty);
 
-                if (propertyCount > 1)
+                if (structProperty->Struct)
                 {
-                    propertyType = "struct " + Generator::GenerateValidName(reinterpret_cast<UStructProperty*>(uProperty)->Struct->Outer->GetNameCPP() + "_" + Generator::GenerateValidName(reinterpret_cast<UStructProperty*>(uProperty)->Struct->GetNameCPP()));
-                }
-                else
-                {
-                    propertyType = "struct " + Generator::GenerateValidName(reinterpret_cast<UStructProperty*>(uProperty)->Struct->GetNameCPP());
-                }
+                    uint32_t propertyCount = UObject::CountObject<UScriptStruct>(structProperty->Struct->GetName());
 
-                return EPropertyTypes::TYPE_FSTRUCT;
+                    if (propertyCount > 1)
+                    {
+                        if (structProperty->Struct->Outer)
+                        {
+                            propertyType = "struct " + Generator::GenerateValidName(structProperty->Struct->Outer->GetNameCPP() + "_" + Generator::GenerateValidName(structProperty->Struct->GetNameCPP()));
+                        }
+                        else
+                        {
+                            propertyType = "struct " + Generator::GenerateValidName(structProperty->Struct->GetNameCPP() + "_Outer" + std::to_string(propertyCount));
+                        }
+                    }
+                    else
+                    {
+                        propertyType = "struct " + Generator::GenerateValidName(structProperty->Struct->GetNameCPP());
+                    }
+
+                    return EPropertyTypes::TYPE_FSTRUCT;
+                }
             }
             else if (uProperty->IsA(UStrProperty::StaticClass()))
             {
                 propertyType = "class FString";
-
                 return EPropertyTypes::TYPE_FSTRING;
             }
             else if (uProperty->IsA(UQWordProperty::StaticClass()))
             {
                 propertyType = "uint64_t";
-
                 return EPropertyTypes::TYPE_UINT64;
             }
             else if (uProperty->IsA(UObjectProperty::StaticClass()))
             { 
-                propertyType = "class " + Generator::GenerateValidName(reinterpret_cast<UObjectProperty*>(uProperty)->PropertyClass->GetNameCPP()) + "*";
+                UObjectProperty* objectProperty = reinterpret_cast<UObjectProperty*>(uProperty);
 
-                return EPropertyTypes::TYPE_UPOINTER;
+                if (objectProperty->PropertyClass)
+                {
+                    propertyType = "class " + Generator::GenerateValidName(objectProperty->PropertyClass->GetNameCPP()) + "*";
+                    return EPropertyTypes::TYPE_UPOINTER;
+                }
             }
             else if (uProperty->IsA(UClassProperty::StaticClass()))
             {
-                propertyType = "class " + Generator::GenerateValidName(reinterpret_cast<UClassProperty*>(uProperty)->MetaClass->GetNameCPP()) + "*";
+                UClassProperty* classProperty = reinterpret_cast<UClassProperty*>(uProperty);
 
-                return EPropertyTypes::TYPE_UPOINTER;
+                if (classProperty->MetaClass)
+                {
+                    propertyType = "class " + Generator::GenerateValidName(classProperty->MetaClass->GetNameCPP()) + "*";
+                    return EPropertyTypes::TYPE_UPOINTER;
+                }
             }
             else if (uProperty->IsA(UNameProperty::StaticClass()))
             {
                 propertyType = "struct FName";
-
                 return EPropertyTypes::TYPE_FNAME;
             }
             else if (uProperty->IsA(UMapProperty::StaticClass()))
@@ -326,31 +340,32 @@ namespace Retrievers
             else if (uProperty->IsA(UIntProperty::StaticClass()))
             {
                 propertyType = "int32_t";
-
                 return EPropertyTypes::TYPE_INT32;
             }
             else if (uProperty->IsA(UInterfaceProperty::StaticClass()))
             {
-                propertyType = "class " + Generator::GenerateValidName(reinterpret_cast<UInterfaceProperty*>(uProperty)->InterfaceClass->GetNameCPP()) + "*";
+                UInterfaceProperty* interfaceProperty = reinterpret_cast<UInterfaceProperty*>(uProperty);
+
+                if (interfaceProperty->InterfaceClass)
+                {
+                    propertyType = "class " + Generator::GenerateValidName(interfaceProperty->InterfaceClass->GetNameCPP()) + "*";
+                }
 
                 return EPropertyTypes::TYPE_UPOINTER;
             }
             else if (uProperty->IsA(UFloatProperty::StaticClass()))
             {
                 propertyType = "float";
-
                 return EPropertyTypes::TYPE_FLOAT;   
             }
             else if (uProperty->IsA(UDelegateProperty::StaticClass()))
             {
                 propertyType = "struct FScriptDelegate";
-
                 return EPropertyTypes::TYPE_FSCRIPTDELEGATE;
             }
             else if (uProperty->IsA(UByteProperty::StaticClass()))
             {
                 propertyType = "uint8_t";
-
                 return EPropertyTypes::TYPE_UINT8;
             }
             else if (uProperty->IsA(UBoolProperty::StaticClass()))
@@ -358,68 +373,36 @@ namespace Retrievers
                 if (returnFunction)
                 {
                     propertyType = "bool";
-
                     return EPropertyTypes::TYPE_BOOL;
                 }
                 else
                 {
                     propertyType = "unsigned long";
-
                     return EPropertyTypes::TYPE_ULONG;
                 }
             }
             else if (uProperty->IsA(UArrayProperty::StaticClass()))
             {
-                std::string propertyTypeInner;
+                UArrayProperty* arrayProperty = reinterpret_cast<UArrayProperty*>(uProperty);
 
-                if (GetPropertyType(reinterpret_cast<UArrayProperty*>(uProperty)->Inner, propertyTypeInner, returnFunction) != EPropertyTypes::TYPE_UNKNOWN)
+                if (arrayProperty->Inner)
                 {
-                    propertyType = "TArray<" + propertyTypeInner + ">";
+                    std::string innerProperty;
 
-                    return EPropertyTypes::TYPE_TARRAY;
+                    if (GetPropertyType(arrayProperty, innerProperty, returnFunction) != EPropertyTypes::TYPE_UNKNOWN)
+                    {
+                        propertyType = "TArray<" + innerProperty + ">";
+                        return EPropertyTypes::TYPE_TARRAY;
+                    }
+                    else
+                    {
+                        return EPropertyTypes::TYPE_UNKNOWN;
+                    }
                 }
-                else
-                {
-                    return EPropertyTypes::TYPE_UNKNOWN;
-                }
-            }
-            else
-            {
-                return EPropertyTypes::TYPE_UNKNOWN;
             }
         }
-        else
-        {
-            return EPropertyTypes::TYPE_UNKNOWN;
-        }
-    }
-
-    std::string GetFieldType(EPropertyTypes propertyType, EClassTypes classType, bool& foundType)
-    {
-        std::string fieldType;
-
-        if (propertyType != EPropertyTypes::TYPE_UNKNOWN)
-        {
-            foundType = true;
-        }
-        else if (classType != EClassTypes::CLASS_UNKNOWN)
-        {
-            switch (classType)
-            {
-            case EClassTypes::CLASS_UOBJECT:
-                fieldType = "class UObject*";
-                break;
-            case EClassTypes::CLASS_UFIELD:
-                fieldType = "class UField*";
-                break;
-            }
-        }
-        else
-        {
-            foundType = false;
-        }
-
-        return fieldType;
+        
+        return EPropertyTypes::TYPE_UNKNOWN;
     }
 
     size_t GetPropertySize(UProperty* uProperty)
@@ -482,15 +465,9 @@ namespace Retrievers
             {
                 return sizeof(TArray<uintptr_t>);
             }
-            else
-            {
-                return 0;
-            }
         }
-        else
-        {
-            return 0;
-        }
+        
+        return 0;
     }
 }
 
@@ -499,7 +476,7 @@ namespace StructGenerator
     UScriptStruct* FindLargestStruct(const std::string& structFullName)
     {
         unsigned long propertySize = 0;
-        UScriptStruct* uLargestStruct = nullptr;
+        UScriptStruct* largestStruct = nullptr;
 
         for (UObject* uObject : *UObject::GObjObjects())
         {
@@ -511,14 +488,14 @@ namespace StructGenerator
 
                     if (uStruct->PropertySize >= propertySize)
                     {
-                        uLargestStruct = uStruct;
+                        largestStruct = uStruct;
                         propertySize = uStruct->PropertySize;
                     }
                 }
             }
         }
 
-        return uLargestStruct;
+        return largestStruct;
     }
 
     void GenerateStruct(File& file, class UScriptStruct* uScriptStruct)
@@ -552,25 +529,24 @@ namespace StructGenerator
         int32_t lastOffset = 0;
         int32_t missedOffset = 0;
 
-        UScriptStruct* uSuperField = reinterpret_cast<UScriptStruct*>(uScriptStruct->SuperField);
-
+        UScriptStruct* superField = reinterpret_cast<UScriptStruct*>(uScriptStruct->SuperField);
         uint32_t structCount = UObject::CountObject<UScriptStruct>(structName);
 
-        if (uSuperField && uSuperField != uScriptStruct)
+        if (superField && superField != uScriptStruct)
         {
-            size = uScriptStruct->PropertySize - uSuperField->PropertySize;
-            lastOffset = uSuperField->PropertySize;
+            size = uScriptStruct->PropertySize - superField->PropertySize;
+            lastOffset = superField->PropertySize;
 
-            std::string fieldName = Generator::GenerateValidName(uSuperField->GetName());
-            std::string fieldNameCPP = Generator::GenerateValidName(uSuperField->GetNameCPP());
-            std::string fieldOuterNameCPP = Generator::GenerateValidName(uSuperField->Outer->GetNameCPP());
+            std::string fieldName = Generator::GenerateValidName(superField->GetName());
+            std::string fieldNameCPP = Generator::GenerateValidName(superField->GetNameCPP());
+            std::string fieldOuterNameCPP = Generator::GenerateValidName(superField->Outer->GetNameCPP());
 
             uint32_t fieldStructCount = UObject::CountObject<UScriptStruct>(fieldName);
 
             structStream << "// ";
             Printers::MakeHex(structStream, size, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
             structStream << " (";
-            Printers::MakeHex(structStream, uSuperField->PropertySize, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
+            Printers::MakeHex(structStream, superField->PropertySize, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
             structStream << " - ";
             Printers::MakeHex(structStream, uScriptStruct->PropertySize, static_cast<uint32_t>(EWidthTypes::WIDTH_SIZE));
             structStream << ")" << "\n";
@@ -812,9 +788,9 @@ namespace StructGenerator
 
     void GenerateStructProperties(File& file, class UScriptStruct* uScriptStruct, class UObject* uPackageObj)
     {
-        UObject* uPackageObject = uScriptStruct->GetPackageObj();
+        UObject* packageObject = uScriptStruct->GetPackageObj();
 
-        if (uPackageObject && uPackageObject == uPackageObj)
+        if (packageObject && packageObject == uPackageObj)
         {
             static std::vector<std::string> generatedStructs;
 
@@ -846,7 +822,7 @@ namespace StructGenerator
                     {
                         UScriptStruct* propertyStruct = reinterpret_cast<UScriptStruct*>(reinterpret_cast<UStructProperty*>(uStructProperty)->Struct);
 
-                        if (propertyStruct != uScriptStruct && std::find(generatedStructs.begin(), generatedStructs.end(), propertyStruct->GetFullName()) == generatedStructs.end())
+                        if (propertyStruct && propertyStruct != uScriptStruct && std::find(generatedStructs.begin(), generatedStructs.end(), propertyStruct->GetFullName()) == generatedStructs.end())
                         {
                             GenerateStructProperties(file, propertyStruct, uPackageObj);
                         }
@@ -877,13 +853,13 @@ namespace StructGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UScriptStruct::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UScriptStruct::StaticClass()))
                     {
-                        GenerateStructProperties(file, reinterpret_cast<UScriptStruct*>(uObject), uPackageObject);
+                        GenerateStructProperties(file, reinterpret_cast<UScriptStruct*>(uObject), packageObject);
                     }
                 }
             }
@@ -899,7 +875,6 @@ namespace ConstGenerator
         std::ostringstream valueStream;
 
         static std::multimap<std::string, std::string> nameValueMap;
-
         std::string constName = Generator::GenerateValidName(uConst->GetName());
 
         if (constName.find("Default__") == std::string::npos)
@@ -949,11 +924,11 @@ namespace ConstGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UConst::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UConst::StaticClass()))
                     {
                         GenerateConst(file, reinterpret_cast<UConst*>(uObject));
                     }
@@ -1062,11 +1037,11 @@ namespace EnumGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UEnum::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UEnum::StaticClass()))
                     {
                         GenerateEnum(file, reinterpret_cast<UEnum*>(uObject));
                     }
@@ -1087,7 +1062,7 @@ namespace ClassGenerator
         size_t missedOffset = 0;
         size_t lastOffset = 0;
 
-        std::map<std::uintptr_t, ClassField> fields = Fields::GetOrderedFields(classType, localSize, startOffset);
+        std::map<uintptr_t, ClassField> fields = Fields::GetOrderedFields(classType, localSize, startOffset);
 
         if (fields.size() > 0)
         {
@@ -1500,27 +1475,27 @@ namespace ClassGenerator
 
     void GenerateClassProperties(File& file, class UClass* uClass, class UObject* uPackageObj)
     {
-        UObject* uPackageObject = uClass->GetPackageObj();
+        UObject* packageObject = uClass->GetPackageObj();
 
-        if (uPackageObject)
+        if (packageObject)
         {
             if (std::find(Generator::vIncludes.begin(), Generator::vIncludes.end(), uPackageObj) == Generator::vIncludes.end())
             {
                 Generator::vIncludes.push_back(uPackageObj);
             }
 
-            if (uPackageObject != uPackageObj)
+            if (packageObject != uPackageObj)
             {
-                std::vector<UObject*>::iterator itPO = std::find(Generator::vIncludes.begin(), Generator::vIncludes.end(), uPackageObject);
+                std::vector<UObject*>::iterator itPO = std::find(Generator::vIncludes.begin(), Generator::vIncludes.end(), packageObject);
                 std::vector<UObject*>::iterator itPTP = std::find(Generator::vIncludes.begin(), Generator::vIncludes.end(), uPackageObj);
 
                 if (itPO == Generator::vIncludes.end())
                 {
-                    Generator::vIncludes.insert(itPTP, uPackageObject);
+                    Generator::vIncludes.insert(itPTP, packageObject);
                 }
                 else if (itPO >= itPTP)
                 {
-                    Generator::vIncludes.insert(itPTP, uPackageObject);
+                    Generator::vIncludes.insert(itPTP, packageObject);
                     Generator::vIncludes.erase(itPO);
                 }
 
@@ -1557,13 +1532,13 @@ namespace ClassGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
                     {
-                        GenerateClassProperties(file, reinterpret_cast<UClass*>(uObject), uPackageObject);
+                        GenerateClassProperties(file, reinterpret_cast<UClass*>(uObject), packageObject);
                     }
                 }
             }
@@ -1736,11 +1711,11 @@ namespace ParameterGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
                     {
                         GenerateParameter(file, reinterpret_cast<UClass*>(uObject));
                     }
@@ -2302,11 +2277,11 @@ namespace FunctionGenerator
         {
             if (uObject)
             {
-                UObject* uPackageObject = uObject->GetPackageObj();
+                UObject* packageObject = uObject->GetPackageObj();
 
-                if (uPackageObject)
+                if (packageObject)
                 {
-                    if (uPackageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
+                    if (packageObject == uPackageObj && uObject->IsA(UClass::StaticClass()))
                     {
                         GenerateFunctionCode(file, reinterpret_cast<UClass*>(uObject));
                     }
@@ -2635,67 +2610,67 @@ namespace Generator
             {
                 if (uObject->IsA(UClass::StaticClass()))
                 {
-                    UObject* uPackageObject = uObject->GetPackageObj();
+                    UObject* packageObject = uObject->GetPackageObj();
 
-                    if (uPackageObject)
+                    if (packageObject)
                     {
-                        if (find(vPackages.begin(), vPackages.end(), uPackageObject) == vPackages.end())
+                        if (find(vPackages.begin(), vPackages.end(), packageObject) == vPackages.end())
                         {
                             Generator::LogFile.NewLine();
-                            Generator::LogFile.Write("Processing Package: " + uPackageObject->GetName());
+                            Generator::LogFile.Write("Processing Package: " + packageObject->GetName());
                             Generator::LogFile.NewLine();
                             Generator::LogFile.NewLine();
 
-                            vPackages.push_back(uPackageObject);
+                            vPackages.push_back(packageObject);
 
                             File file;
 
                             // Structs
-                            file.Create(fullDirectory, uPackageObject->GetName() + "_structs.hpp");
+                            file.Create(fullDirectory, packageObject->GetName() + "_structs.hpp");
 
-                            Printers::PrintHeader(file, uPackageObject->GetName() + "_structs", "hpp", true);
+                            Printers::PrintHeader(file, packageObject->GetName() + "_structs", "hpp", true);
 
                             Printers::PrintSection(file, "Script Structs");
-                            StructGenerator::ProcessStructs(file, uPackageObject);
+                            StructGenerator::ProcessStructs(file, packageObject);
 
                             Printers::PrintFooter(file, true);                
                             file.Close();
 
                             // Classes
-                            file.Create(fullDirectory, uPackageObject->GetName() + "_classes.hpp");
+                            file.Create(fullDirectory, packageObject->GetName() + "_classes.hpp");
 
-                            Printers::PrintHeader(file, uPackageObject->GetName() + "_classes", "hpp", true);
+                            Printers::PrintHeader(file, packageObject->GetName() + "_classes", "hpp", true);
 
                             Printers::PrintSection(file, "Constants");
-                            ConstGenerator::ProcessConsts(file, uPackageObject);
+                            ConstGenerator::ProcessConsts(file, packageObject);
 
                             Printers::PrintSection(file, "Enums");
-                            EnumGenerator::ProcessEnums(file, uPackageObject);
+                            EnumGenerator::ProcessEnums(file, packageObject);
 
                             Printers::PrintSection(file, "Classes");
-                            ClassGenerator::ProcessClasses(file, uPackageObject);
+                            ClassGenerator::ProcessClasses(file, packageObject);
 
                             Printers::PrintFooter(file, true);                 
                             file.Close();
 
                             // Parameters
-                            file.Create(fullDirectory, uPackageObject->GetName() + "_parameters.hpp");
+                            file.Create(fullDirectory, packageObject->GetName() + "_parameters.hpp");
 
-                            Printers::PrintHeader(file, uPackageObject->GetName() + "_parameters", "hpp", true);
+                            Printers::PrintHeader(file, packageObject->GetName() + "_parameters", "hpp", true);
 
                             Printers::PrintSection(file, "Function Parameters");
-                            ParameterGenerator::ProcessParameters(file, uPackageObject);
+                            ParameterGenerator::ProcessParameters(file, packageObject);
 
                             Printers::PrintFooter(file, true);
                             file.Close();
 
                             // Functions
-                            file.Create(fullDirectory, uPackageObject->GetName() + "_classes.cpp");
+                            file.Create(fullDirectory, packageObject->GetName() + "_classes.cpp");
 
-                            Printers::PrintHeader(file, uPackageObject->GetName() + "_classes", "cpp", true);
+                            Printers::PrintHeader(file, packageObject->GetName() + "_classes", "cpp", true);
 
                             Printers::PrintSection(file, "Functions");
-                            FunctionGenerator::ProcessFunctions(file, uPackageObject);
+                            FunctionGenerator::ProcessFunctions(file, packageObject);
 
                             Printers::PrintFooter(file, true);
                             file.Close();
@@ -2833,7 +2808,7 @@ namespace Generator
             if (dumpGObjectsFull)
             {
                 File file;
-                file.Create(fullDirectory, "FullNameDump.txt");
+                file.Create(fullDirectory, "FullObjectDump.txt");
 
                 file.Write("Base: ");
                 file.Hex(baseAddress, static_cast<int32_t>(Configuration::Alignment));
@@ -2888,8 +2863,8 @@ namespace Generator
             {
                 uintptr_t GObjectsAddress = baseAddress + Configuration::GObjectsOffset;
                 uintptr_t GNamesAddress = baseAddress + Configuration::GNamesOffset;
-                GObjects = reinterpret_cast<TArray<class UObject*>*>(GObjectsAddress);
-                GNames = reinterpret_cast<TArray<struct FNameEntry*>*>(GNamesAddress);
+                GObjects = reinterpret_cast<TArray<UObject*>*>(GObjectsAddress);
+                GNames = reinterpret_cast<TArray<FNameEntry*>*>(GNamesAddress);
             }
 
             UObject::RegVfTableObject();
@@ -2898,14 +2873,13 @@ namespace Generator
             UObject::RegName();
             UObject::RegClass();
             UField::RegNext();
-            //UField::RegSuperField();              // COMMENT OUT ACCORDINGLY!
             UEnum::RegNames();
             UConst::RegValue();
             UProperty::RegArrayDim();
             UProperty::RegElementSize();
             UProperty::RegPropertyFlags();
             UProperty::RegOffset();
-            UStruct::RegSuperField();               // COMMENT OUT ACCORDINGLY!
+            UStruct::RegSuperField();
             UStruct::RegChildren();
             UStruct::RegPropertySize();
             UFunction::RegFunctionFlags();
@@ -2916,8 +2890,8 @@ namespace Generator
             UMapProperty::RegKey();
             UMapProperty::RegValue();
             UInterfaceProperty::RegInterfaceClass();
-            UDelegateProperty::RegFunction();
-            UDelegateProperty::RegDelegateName();
+            //UDelegateProperty::RegFunction(); // Not actually needed in sdk generation at the moment.
+            //UDelegateProperty::RegDelegateName(); // Not actually needed in sdk generation at the moment.
             UByteProperty::RegEnum();
             UBoolProperty::RegBitMask();
             UArrayProperty::RegInner();
@@ -2931,7 +2905,6 @@ namespace Generator
 
             std::filesystem::create_directory(Configuration::GeneratorDirectory);
             std::filesystem::create_directory(fullDirectory);
-
             Generator::LogFile.Create(fullDirectory, "UE3SDKGenerator.log");
 
             Generator::LogFile.Write("Base: ");
@@ -2950,8 +2923,8 @@ namespace Generator
 void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
-    Generator::GenerateSDK();
-    //Generator::DumpInstances(true, false, true);
+    //Generator::GenerateSDK();
+    Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)

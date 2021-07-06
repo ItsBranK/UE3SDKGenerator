@@ -471,7 +471,7 @@ public:
 	ElementPointer ElementData;				// 0x0000 (0x0008)
 	int32_t ElementCount;					// 0x0008 (0x0004)
 	int32_t ElementMax;						// 0x000C (0x0004)
-	std::uintptr_t IndirectData;            // 0x0010 (0x0008)
+	uintptr_t IndirectData;					// 0x0010 (0x0008)
 	int32_t InlineData[0x4];                // 0x0018 (0x0010)
 	int32_t NumBits;                        // 0x0028 (0x0004)
 	int32_t MaxBits;                        // 0x002C (0x0004)
@@ -610,7 +610,7 @@ class ClassField
 public:
 	EFieldIds Id;
 	std::string Type;
-	std::uintptr_t Offset;
+	uintptr_t Offset;
 	size_t Size;
 
 public:
@@ -628,8 +628,8 @@ namespace Fields
 	extern std::map<EFieldIds, std::string> IdToType;
 	extern std::map<EFieldIds, ClassField> GlobalFields;
 
-	std::uintptr_t GetOffset(EFieldIds fieldId);
-	std::map<std::uintptr_t, ClassField> GetOrderedFields(EClassTypes classType, size_t& classSize, size_t& startOffset);
+	uintptr_t GetOffset(EFieldIds fieldId);
+	std::map<uintptr_t, ClassField> GetOrderedFields(EClassTypes classType, size_t& classSize, size_t& startOffset);
 	void AssertField(const ClassField& classField);
 }
 
@@ -1027,10 +1027,11 @@ public:
 };
 
 // FScriptDelegate [This struct is game dependent, don't forget to reverse its contents or just its size!]
-// (0x0000 - 0x0008)
+// (0x0000 - 0x0009)
 struct FScriptDelegate
 {
-	class UObject*		Object;										// 0x0000 (0x08)
+	class UObject* Object;				// 0x0000 (0x08)
+	uint8_t UnknownData[0x1];			// 0x0008 (0x01)
 };
 
 struct FPointer
@@ -1058,7 +1059,7 @@ public:
 	struct FPointer VfTableObject;		REGISTER_FIELD(FPointer, VfTableObject, EFieldIds::UOBJECT_VFTABLE)				// 0x0000 (0x08)
 	uint8_t UnknownData00[0x10];		// Example of padding, you do not need to register this because offsets are all automatically calculated.
 	int32_t ObjectInternalInteger;		REGISTER_FIELD(int32_t, ObjectInternalInteger, EFieldIds::UOBJECT_INDEX)		// 0x0018 (0x04)
-	class UObject* Outer;				REGISTER_FIELD(class UObject*,Outer, EFieldIds::UOBJECT_OUTER)					// 0x001C (0x08)
+	class UObject* Outer;				REGISTER_FIELD(class UObject*, Outer, EFieldIds::UOBJECT_OUTER)					// 0x001C (0x08)
 	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UOBJECT_NAME)							// 0x0024 (0x08)
 	class UClass* Class;				REGISTER_FIELD(class UClass*, Class, EFieldIds::UOBJECT_CLASS)					// 0x002C (0x08)
 
@@ -1330,7 +1331,7 @@ public:
 class UStructProperty : public UProperty
 {
 public:
-	class UStruct* Struct;				REGISTER_FIELD(class UStruct*, Struct, EFieldIds::USTRUCTPROPERTY_STRUCT)				// 0x0058 (0x08)
+	class UStruct* Struct;				REGISTER_FIELD(class UStruct*, Struct, EFieldIds::USTRUCTPROPERTY_STRUCT)			// 0x0058 (0x08)
 
 public:
 	static UClass* StaticClass()
@@ -1389,7 +1390,7 @@ public:
 class UObjectProperty : public UProperty
 {
 public:
-	class UClass* PropertyClass;		REGISTER_FIELD(class UClass*, PropertyClass, EFieldIds::UOBJECTPROPERTY_PROPERTY)		// 0x0058 (0x08)
+	class UClass* PropertyClass;		REGISTER_FIELD(class UClass*, PropertyClass, EFieldIds::UOBJECTPROPERTY_PROPERTY)	// 0x0058 (0x08)
 
 public:
 	static UClass* StaticClass()
@@ -1429,7 +1430,7 @@ public:
 class UClassProperty : public UObjectProperty
 {
 public:
-	class UClass* MetaClass;			REGISTER_FIELD(class UClass*, MetaClass, EFieldIds::UCLASSPROPERTY_METACLASS)			// 0x0058 (0x08)
+	class UClass* MetaClass;			REGISTER_FIELD(class UClass*, MetaClass, EFieldIds::UCLASSPROPERTY_METACLASS)		// 0x0058 (0x08)
 
 public:
 	static UClass* StaticClass()
@@ -1469,8 +1470,8 @@ public:
 class UMapProperty : public UProperty
 {
 public:
-	class UProperty* Key;				REGISTER_FIELD(class UProperty*, Key, EFieldIds::UMAPPROPERTY_KEY)						// 0x0058 (0x08)
-	class UProperty* Value;				REGISTER_FIELD(class UProperty*, Value, EFieldIds::UMAPPROPERTY_VALUE)					// 0x0060 (0x08)
+	class UProperty* Key;				REGISTER_FIELD(class UProperty*, Key, EFieldIds::UMAPPROPERTY_KEY)					// 0x0058 (0x08)
+	class UProperty* Value;				REGISTER_FIELD(class UProperty*, Value, EFieldIds::UMAPPROPERTY_VALUE)				// 0x0060 (0x08)
 
 public:
 	static UClass* StaticClass()
@@ -1510,7 +1511,7 @@ public:
 class UInterfaceProperty : public UProperty
 {
 public:
-	class UClass* InterfaceClass;		REGISTER_FIELD(class UClass*, InterfaceClass, EFieldIds::UINTERFACEPROPERTY_CLASS)		// 0x0058 (0x08)
+	class UClass* InterfaceClass;		REGISTER_FIELD(class UClass*, InterfaceClass, EFieldIds::UINTERFACEPROPERTY_CLASS)	// 0x0058 (0x08)
 
 public:
 	static UClass* StaticClass()
@@ -1551,7 +1552,7 @@ class UDelegateProperty : public UProperty
 {
 public:
 	class UFuncton* Function;			REGISTER_FIELD(class UFuncton*, Function, EFieldIds::UDELEGATEPROPERTY_FUNCTION)		// 0x0058 (0x08)
-	struct FName DelegateName;			REGISTER_FIELD(FName, DelegateName, EFieldIds::UDELEGATEPROPERTY_NAME)					// 0x0060 (0x08)
+	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UDELEGATEPROPERTY_NAME)							// 0x0060 (0x08)
 
 public:
 	static UClass* StaticClass()

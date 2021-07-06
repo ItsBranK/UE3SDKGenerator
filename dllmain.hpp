@@ -14,7 +14,7 @@ namespace Utils
 {
 	MODULEINFO GetModuleInfo(LPCTSTR lpModuleName);
 	uintptr_t FindPattern(HMODULE module, const uint8_t* pattern, const char* mask);
-	bool MapExists(std::multimap<std::string, std::string>& map, std::string& key, std::string& value);
+	bool MapExists(std::multimap<std::string, std::string>& map, const std::string& key, const std::string& value);
 	bool SortPropertyPair(std::pair<class UProperty*, std::string> uPropertyA, std::pair<class UProperty*, std::string> uPropertyB);
 	bool SortProperty(class UProperty* uPropertyA, class UProperty* uPropertyB);
 	bool IsStructProperty(EPropertyTypes propertyType);
@@ -29,7 +29,6 @@ namespace Retrievers
 	void GetAllPropertyFlags(std::ostringstream& stream, uint64_t propertyFlags);
 	void GetAllFunctionFlags(std::ostringstream& stream, uint64_t functionFlags);
 	EPropertyTypes GetPropertyType(class UProperty* uProperty, std::string& uPropertyType, bool returnFunction);
-	std::string GetFieldType(EPropertyTypes propertyType, EClassTypes classType, bool& foundType);
 	size_t GetPropertySize(class UProperty* uProperty);
 }
 
