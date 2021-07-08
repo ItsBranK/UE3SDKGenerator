@@ -146,16 +146,17 @@
     <ClCompile Include="Engine\Template\GameDefines.cpp" />
     <ClCompile Include="Engine\Template\PiecesOfCode.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Printers.cpp" />
+    <ClCompile Include="Printer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Changelog.hpp" />
     <ClInclude Include="dllmain.hpp" />
     <ClInclude Include="Engine\Engine.hpp" />
     <ClInclude Include="Engine\Template\Configuration.hpp" />
     <ClInclude Include="Engine\Template\GameDefines.hpp" />
     <ClInclude Include="Engine\Template\PiecesOfCode.hpp" />
     <ClInclude Include="pch.hpp" />
-    <ClInclude Include="Printers.hpp" />
+    <ClInclude Include="Printer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

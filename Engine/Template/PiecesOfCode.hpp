@@ -14,6 +14,7 @@ namespace PiecesOfCode
 	extern const std::string TArray_Iterator;
 	extern const std::string TArray_Class;
 	extern const std::string TMap_Class;
+	extern const std::string FNameEntry_UPPER;
 	extern const std::string FNameEntry_UTF16;
 	extern const std::string FNameEntry_UTF8;
 	extern const std::string FName_UTF16;

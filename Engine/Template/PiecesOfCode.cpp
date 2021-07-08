@@ -79,7 +79,7 @@ namespace PiecesOfCode
 		"\t{\n"
 		"\t\treturn !(*this == other);\n"
 		"\t}\n"
-		"};\n\n";
+		"};\n";
 
 	const std::string TArray_Class =
 		"template<typename InElementType>\n"
@@ -233,7 +233,7 @@ namespace PiecesOfCode
 		"\t\tArrayData = newArrayData;\n"
 		"\t\tArrayMax = newArrayMax;\n"
 		"\t}\n"
-		"};\n\n";
+		"};\n";
 
 	const std::string TMap_Class =
 		"template<typename TKey, typename TValue>\n"
@@ -377,13 +377,12 @@ namespace PiecesOfCode
 		"\t}\n"
 		"};\n";
 
-	const std::string FNameEntry_UTF16 =
+	const std::string FNameEntry_UPPER =
 		"struct FNameEntry\n"
 		"{\n"
-		"public:\n"
-		"\tuint64_t\t\tFlags;\t\t\t\t\t\t\t\t\t\t// 0x0000 (0x08)\n"
-		"\tint32_t\t\t\tIndex;\t\t\t\t\t\t\t\t\t\t// 0x0008 (0x04)\n"
-		"\twchar_t\t\t\tName[0x400];\t\t\t\t\t\t\t\t// 0x000C (0x00)\n"
+		"public:\n";
+
+	const std::string FNameEntry_UTF16 =
 		"\n"
 		"public:\n"
 		"\tint32_t GetIndex() const\n"
@@ -405,12 +404,6 @@ namespace PiecesOfCode
 		"};\n";
 
 	const std::string FNameEntry_UTF8 =
-		"struct FNameEntry\n"
-		"{\n"
-		"public:\n"
-		"\tuint64_t\t\tFlags;\t\t\t\t\t\t\t\t\t\t// 0x0000 (0x08)\n"
-		"\tint32_t\t\t\tIndex;\t\t\t\t\t\t\t\t\t\t// 0x0008 (0x04)\n"
-		"\tchar\t\t\tName[0x400];\t\t\t\t\t\t\t\t// 0x000C (0x00)\n"
 		"\n"
 		"public:\n"
 		"\tint32_t GetIndex() const\n"
@@ -426,8 +419,7 @@ namespace PiecesOfCode
 		"\tconst char* GetAnsiName() const\n"
 		"\t{\n"
 		"\t\treturn Name;\n"
-		"\t}\n"
-		"};\n";
+		"\t}\n";
 
 	const std::string FName_UTF16 =
 		"struct FName\n"

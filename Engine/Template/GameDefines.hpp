@@ -116,66 +116,70 @@ enum EPropertyFlags
 enum class EClassTypes : uint8_t
 {
 	CLASS_UNKNOWN =                         0,
-	CLASS_UOBJECT =                         1,
-	CLASS_UFIELD =                          2,
-	CLASS_UENUM =                           3,
-	CLASS_UCONST =                          4,
-	CLASS_UPROPERTY =                       5,
-	CLASS_USTRUCT =                         6,
-	CLASS_UFUNCTION =                       7,
-	CLASS_USCRIPTSTRUCT =                   8,
-	CLASS_USTATE =                          9,
-	CLASS_UCLASS =                          10,
-	CLASS_USTRUCTPROPERTY =                 11,
-	CLASS_USTRPROPERTY =                    12,
-	CLASS_UQWORDPROPERTY =                  13,
-	CLASS_UOBJECTPROPERTY =                 14,
-	CLASS_UCOMPONENTPROPERTY =              15,
-	CLASS_UCLASSPROPERTY =                  16,
-	CLASS_UNAMEPROPERTY =                   17,
-	CLASS_UMAPPROPERTY =                    18,
-	CLASS_UINTPROPERTY =                    19,
-	CLASS_UINTERFACEPROPERTY =              20,
-	CLASS_UFLOATPROPERTY =                  21,
-	CLASS_UDELEGATEPROPERTY =               22,
-	CLASS_UBYTEPROPERTY =                   23,
-	CLASS_UBOOLPROPERTY =                   24,
-	CLASS_UARRAYPROPERTY =                  25
+	CLASS_FNAMEENTRY =                      1,
+	CLASS_UOBJECT =                         2,
+	CLASS_UFIELD =                          3,
+	CLASS_UENUM =                           4,
+	CLASS_UCONST =                          5,
+	CLASS_UPROPERTY =                       6,
+	CLASS_USTRUCT =                         7,
+	CLASS_UFUNCTION =                       8,
+	CLASS_USCRIPTSTRUCT =                   9,
+	CLASS_USTATE =                          10,
+	CLASS_UCLASS =                          11,
+	CLASS_USTRUCTPROPERTY =                 12,
+	CLASS_USTRPROPERTY =                    13,
+	CLASS_UQWORDPROPERTY =                  14,
+	CLASS_UOBJECTPROPERTY =                 15,
+	CLASS_UCOMPONENTPROPERTY =              16,
+	CLASS_UCLASSPROPERTY =                  17,
+	CLASS_UNAMEPROPERTY =                   18,
+	CLASS_UMAPPROPERTY =                    19,
+	CLASS_UINTPROPERTY =                    20,
+	CLASS_UINTERFACEPROPERTY =              21,
+	CLASS_UFLOATPROPERTY =                  22,
+	CLASS_UDELEGATEPROPERTY =               23,
+	CLASS_UBYTEPROPERTY =                   24,
+	CLASS_UBOOLPROPERTY =                   25,
+	CLASS_UARRAYPROPERTY =                  26
 };
 
 // Field Identifiers
 enum class EFieldIds : uint8_t
 {
 	UNKNOWN =                               0,
-	UOBJECT_VFTABLE =                       1,
-	UOBJECT_INDEX =                         2,
-	UOBJECT_OUTER =                         3,
-	UOBJECT_NAME =                          4,
-	UOBJECT_CLASS =                         5,
-	UFIELD_NEXT =                           6,
-	UFIELD_SUPERFIELD =                     7,
-	UENUM_NAMES =                           8,
-	UCONST_VALUE =                          9,
-	UPROPERTY_DIMENSION =                   10,
-	UPROPERTY_SIZE =                        11,
-	UPROPERTY_FLAGS =                       12,
-	UPROPERTY_OFFSET =                      13,
-	USTRUCT_SUPERFIELD =                    14,
-	USTRUCT_CHILDREN =                      15,
-	USTRUCT_SIZE =                          16,
-	UFUNCTION_FLAGS =                       17,
-	UFUNCTION_NATIVE =                      18,
-	USTRUCTPROPERTY_STRUCT =                19,
-	UOBJECTPROPERTY_PROPERTY =              20,
-	UCLASSPROPERTY_METACLASS =              21,
-	UMAPPROPERTY_KEY =                      22,
-	UMAPPROPERTY_VALUE =                    23,
-	UINTERFACEPROPERTY_CLASS =              24,
-	UDELEGATEPROPERTY_FUNCTION =            25,
-	UDELEGATEPROPERTY_NAME =                26,
-	UBYTEPROPERTY_ENUM =                    27,
-	UBOOLPROPERTY_BITMASK =                 28,
-	UARRAYPROPERTY_INNTER =                 29
+	FNAMEENTRY_INDEX =                      1,
+	FNAMEENTRY_NAME_UTF16 =                 2,
+	FNAMEENTRY_NAME_UTF8 =                  3,
+	UOBJECT_VFTABLE =                       4,
+	UOBJECT_INDEX =                         5,
+	UOBJECT_OUTER =                         6,
+	UOBJECT_NAME =                          7,
+	UOBJECT_CLASS =                         8,
+	UFIELD_NEXT =                           9,
+	UFIELD_SUPERFIELD =                     10,
+	UENUM_NAMES =                           11,
+	UCONST_VALUE =                          12,
+	UPROPERTY_DIMENSION =                   13,
+	UPROPERTY_SIZE =                        14,
+	UPROPERTY_FLAGS =                       15,
+	UPROPERTY_OFFSET =                      16,
+	USTRUCT_SUPERFIELD =                    17,
+	USTRUCT_CHILDREN =                      18,
+	USTRUCT_SIZE =                          19,
+	UFUNCTION_FLAGS =                       20,
+	UFUNCTION_NATIVE =                      21,
+	USTRUCTPROPERTY_STRUCT =                22,
+	UOBJECTPROPERTY_PROPERTY =              23,
+	UCLASSPROPERTY_METACLASS =              24,
+	UMAPPROPERTY_KEY =                      25,
+	UMAPPROPERTY_VALUE =                    26,
+	UINTERFACEPROPERTY_CLASS =              27,
+	UDELEGATEPROPERTY_FUNCTION =            28,
+	UDELEGATEPROPERTY_NAME =                29,
+	UBYTEPROPERTY_ENUM =                    30,
+	UBOOLPROPERTY_BITMASK =                 31,
+	UARRAYPROPERTY_INNTER =                 32
 };
 
 // Property Types
@@ -207,13 +211,14 @@ enum class EPropertyTypes : uint16_t
 };
 
 // Width Types
-enum class EWidthTypes : uint16_t
+enum class EWidthTypes : uint64_t
 {
 	WIDTH_NONE =							0,
 	WIDTH_BYTE =                            2,
 	WIDTH_SIZE =                            4,
 	WIDTH_BITMASK =                         8,
 	WIDTH_FUNCTION =                        8,
+	WIDTH_FIELD =                           14,
 	WIDTH_PROPERTY =                        16
 };
 
@@ -646,14 +651,14 @@ namespace Fields
 struct FNameEntry
 {
 public:
-	uint64_t		Flags;										// 0x0000 (0x08)
-	int32_t			Index;										// 0x0008 (0x04)
+	uint64_t Flags;							// 0x0000 (0x08)
+	int32_t Index;							REGISTER_FIELD(int32_t, Index, EFieldIds::FNAMEENTRY_INDEX)						// 0x0008 (0x04)
 
 #ifdef CHARACTER_UTF16
-	wchar_t			Name[0x400];								// 0x000C (0x00)
+	wchar_t			Name[0x400];			REGISTER_FIELD(wchar_t, Name, EFieldIds::FNAMEENTRY_NAME_UTF16)					// 0x000C (0x00)
 #endif
 #ifdef CHARACTER_UTF8
-	char			Name[0x400];								// 0x000C (0x00)
+	char			Name[0x400];			REGISTER_FIELD(wchar_t, Name, EFieldIds::FNAMEENTRY_NAME_UTF8)					// 0x000C (0x00)
 #endif
 
 public:

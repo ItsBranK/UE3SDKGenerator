@@ -22,7 +22,7 @@ namespace Configuration
     const int32_t ClassSpacer =                         50;
     const EAlignment Alignment =                        EAlignment::X64BIT;
 
-    const int32_t ProcessEventIndex =                   0;
+    const int32_t ProcessEventIndex =                   0; // Position where the Process Event function is in UObject's VfTable.
     const std::string ProcessEventString =              "null";
     const uint8_t* ProcessEventPattern =                (uint8_t*)"null";
     const char* ProcessEventMask =                      (char*)"null";
@@ -40,7 +40,7 @@ namespace Configuration
     const std::string GameName =                        "Template";
     const std::string GameNameShort =                   "TSDK";
     const std::string GameVersion =                     "1.0.0.0";
-    const std::filesystem::path GeneratorDirectory =    "UE3SDKGenerator";
+    const std::filesystem::path GeneratorDirectory =    "E:\\Steam\\steamapps\\common\\Template\\UE3SDKGenerator";
 }
 
 /*

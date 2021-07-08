@@ -20,9 +20,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Printers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -38,15 +35,15 @@
     <ClCompile Include="Engine\Template\PiecesOfCode.cpp">
       <Filter>Engine\Template</Filter>
     </ClCompile>
+    <ClCompile Include="Printer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Printers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Engine.hpp">
@@ -60,6 +57,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Template\PiecesOfCode.hpp">
       <Filter>Engine\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="Changelog.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Printer.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

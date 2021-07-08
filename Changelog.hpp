@@ -1,6 +1,21 @@
 #pragma once
 
 /*
+	Changes in v2.1.7:
+	- I forgot to make FNameEntry's fields dynamically generate (whoops), added field register ids for them now in "GameDefines.hpp".
+	- Added the GetEntryPoint and GetOffset functions.
+	- Added extra "std::filesystem::exists" safety checks, along with more null pointer checks.
+	- Added more detailed messagebox information.
+	- Added a WIDTH_FIELD size to the EWidthTypes enum.
+	- Remade the entire "Printers" namespace along with adding some extra functions.
+	- Changed where the validation of globals happens, it has now been moved to the Initialize function.
+	- Everything now uses direct std::ofstream's now.
+	- Added the offset for globals when dumping instances now.
+	- Dumping instances alone no longer creates an "empty" log file.
+	- Adjusted how the start and end time are calculated.
+	- Adjusted the "PiecesOfCode.cpp" structs to remove some new lines.
+	- Organized some namespaces.
+
 	Changes in v2.1.6:
 	- Added some safety/null checks for class fields.
 	- Changed the AreGObjectsValid check to support a wider range of games.

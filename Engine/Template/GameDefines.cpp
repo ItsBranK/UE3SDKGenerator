@@ -39,6 +39,9 @@ namespace Fields
 
 	std::map<EFieldIds, std::string> IdToType
 	{
+		{ EFieldIds::FNAMEENTRY_INDEX, "int32_t Index;" },
+		{ EFieldIds::FNAMEENTRY_NAME_UTF16, "wchar_t Name[0x400];" },
+		{ EFieldIds::FNAMEENTRY_NAME_UTF8, "char Name[0x400];" },
 		{ EFieldIds::UOBJECT_VFTABLE, "struct FPointer VfTableObject;" },
 		{ EFieldIds::UOBJECT_INDEX, "int32_t ObjectInternalInteger;" },
 		{ EFieldIds::UOBJECT_OUTER, "class UObject* Outer;" },
@@ -76,6 +79,12 @@ namespace Fields
 	{
 		switch (fieldId)
 		{
+		case EFieldIds::FNAMEENTRY_INDEX:
+			return offsetof(FNameEntry, Index);
+		case EFieldIds::FNAMEENTRY_NAME_UTF16:
+			return offsetof(FNameEntry, Name);
+		case EFieldIds::FNAMEENTRY_NAME_UTF8:
+			return offsetof(FNameEntry, Name);
 		case EFieldIds::UOBJECT_VFTABLE:
 			return offsetof(UObject, VfTableObject);
 		case EFieldIds::UOBJECT_INDEX:
@@ -145,6 +154,18 @@ namespace Fields
 
 		switch (classType)
 		{
+		case EClassTypes::CLASS_FNAMEENTRY:
+			returnMap.emplace(GlobalFields[EFieldIds::FNAMEENTRY_INDEX].Offset, GlobalFields[EFieldIds::FNAMEENTRY_INDEX]);
+
+#ifdef CHARACTER_UTF16
+			returnMap.emplace(GlobalFields[EFieldIds::FNAMEENTRY_NAME_UTF16].Offset, GlobalFields[EFieldIds::FNAMEENTRY_NAME_UTF16]);
+#endif
+#ifdef CHARACTER_UTF8
+			returnMap.emplace(GlobalFields[EFieldIds::FNAMEENTRY_NAME_UTF8].Offset, GlobalFields[EFieldIds::FNAMEENTRY_NAME_UTF8]);
+#endif
+			classSize = sizeof(FNameEntry);
+			startOffset = 0;
+			break;
 		case EClassTypes::CLASS_UOBJECT:
 			returnMap.emplace(GlobalFields[EFieldIds::UOBJECT_VFTABLE].Offset, GlobalFields[EFieldIds::UOBJECT_VFTABLE]);
 			returnMap.emplace(GlobalFields[EFieldIds::UOBJECT_INDEX].Offset, GlobalFields[EFieldIds::UOBJECT_INDEX]);
