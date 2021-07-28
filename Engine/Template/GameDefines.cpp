@@ -136,7 +136,7 @@ namespace Fields
 		case EFieldIds::UDELEGATEPROPERTY_FUNCTION:
 			return offsetof(UDelegateProperty, Function);
 		case EFieldIds::UDELEGATEPROPERTY_NAME:
-			return offsetof(UDelegateProperty, Name);
+			return offsetof(UDelegateProperty, DelegateName);
 		case EFieldIds::UBYTEPROPERTY_ENUM:
 			return offsetof(UByteProperty, Enum);
 		case EFieldIds::UBOOLPROPERTY_BITMASK:
@@ -241,7 +241,7 @@ namespace Fields
 		case EClassTypes::CLASS_UDELEGATEPROPERTY:
 			returnMap.emplace(GlobalFields[EFieldIds::UDELEGATEPROPERTY_FUNCTION].Offset, GlobalFields[EFieldIds::UDELEGATEPROPERTY_FUNCTION]);
 			returnMap.emplace(GlobalFields[EFieldIds::UDELEGATEPROPERTY_NAME].Offset, GlobalFields[EFieldIds::UDELEGATEPROPERTY_NAME]);
-			classSize = sizeof(UMapProperty);
+			classSize = sizeof(UDelegateProperty);
 			startOffset = sizeof(UProperty);
 			break;
 		case EClassTypes::CLASS_UBYTEPROPERTY:

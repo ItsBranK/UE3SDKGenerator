@@ -1557,7 +1557,7 @@ class UDelegateProperty : public UProperty
 {
 public:
 	class UFuncton* Function;			REGISTER_FIELD(class UFuncton*, Function, EFieldIds::UDELEGATEPROPERTY_FUNCTION)		// 0x0058 (0x08)
-	struct FName Name;					REGISTER_FIELD(FName, Name, EFieldIds::UDELEGATEPROPERTY_NAME)							// 0x0060 (0x08)
+	struct FName DelegateName;			REGISTER_FIELD(FName, DelegateName, EFieldIds::UDELEGATEPROPERTY_NAME)					// 0x0060 (0x08)
 
 public:
 	static UClass* StaticClass()

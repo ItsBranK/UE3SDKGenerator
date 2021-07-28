@@ -1145,7 +1145,7 @@ namespace ClassGenerator
                 if (Generator::LogFile.is_open())
                 {
                     Generator::LogFile << "Error: INCORRECT CLASS SIZE DETECTED FOR CLASS " << uClass->GetName() << "\n";
-                    Generator::LogFile << "Error: REGISTERED FIELD SIZE: " << std::to_string(localSize) << "\n";
+                    Generator::LogFile << "Error: REGISTERED CLASS SIZE: " << std::to_string(localSize) << "\n";
                     Generator::LogFile << "Error: ACTUAL CLASS SIZE: " << std::to_string(uClass->PropertySize) << "\n";
                 }
 
@@ -1272,7 +1272,7 @@ namespace ClassGenerator
                         classStream << "\t";
                         Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
                         classStream << "uint8_t ";
-                        Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer -3);
+                        Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer - 3);
                         classStream << propertyStream.str() << "// " << Printer::Hex(lastOffset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
                         classStream << " (" << Printer::Hex(missedOffset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << ") MISSED OFFSET\n";
                         Printer::Empty(propertyStream);
@@ -1394,11 +1394,6 @@ namespace ClassGenerator
 
         classStream << "\npublic:\n";
 
-        if (uClass == UObject::StaticClass())
-        {
-            classStream << PiecesOfCode::UObject_FunctionDescriptions;
-        }
-
         if (Configuration::UsingConstants)
         {
             classStream << "\tstatic UClass* StaticClass()\n";
@@ -1422,6 +1417,11 @@ namespace ClassGenerator
             classStream << "\t\t}\n\n";
             classStream << "\t\treturn uClassPointer;\n";
             classStream << "\t};\n\n";
+        }
+
+        if (uClass == UObject::StaticClass())
+        {
+            classStream << PiecesOfCode::UObject_FunctionDescriptions;
         }
 
         file << classStream.str();
@@ -2499,7 +2499,7 @@ namespace Generator
         file << "struct FScriptDelegate\n";
         file << "{\n";
         file << "\tuint8_t UnknownData00[" << Printer::Hex(sizeof(FScriptDelegate), static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "];\n";
-        file <<  "}\n";
+        file <<  "};\n";
 
         file << PiecesOfCode::FPointer_Struct << "\n";
         file << PiecesOfCode::FQWord_Struct << "\n";
@@ -2800,8 +2800,8 @@ namespace Generator
                 UMapProperty::RegKey();
                 UMapProperty::RegValue();
                 UInterfaceProperty::RegInterfaceClass();
-                //UDelegateProperty::RegFunction(); // Not actually needed in sdk generation at the moment.
-                //UDelegateProperty::RegDelegateName(); // Not actually needed in sdk generation at the moment.
+                UDelegateProperty::RegFunction(); // Not actually needed in sdk generation at the moment.
+                UDelegateProperty::RegDelegateName(); // Not actually needed in sdk generation at the moment.
                 UByteProperty::RegEnum();
                 UBoolProperty::RegBitMask();
                 UArrayProperty::RegInner();

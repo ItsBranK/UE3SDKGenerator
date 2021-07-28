@@ -13,11 +13,14 @@
       <UniqueIdentifier>{c2909db8-7df0-479c-9864-696d3e87ee8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Template">
-      <UniqueIdentifier>{6a793848-84ba-4b9d-9ae7-d5c1f395fa99}</UniqueIdentifier>
+      <UniqueIdentifier>{e7154432-cab6-4718-9968-2f14d246e14d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Printer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Engine.cpp">
@@ -35,9 +38,6 @@
     <ClCompile Include="Engine\Template\PiecesOfCode.cpp">
       <Filter>Engine\Template</Filter>
     </ClCompile>
-    <ClCompile Include="Printer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.hpp">
@@ -46,8 +46,14 @@
     <ClInclude Include="pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Printer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Engine.hpp">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Changelog.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Template\Configuration.hpp">
       <Filter>Engine\Template</Filter>
@@ -57,12 +63,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Template\PiecesOfCode.hpp">
       <Filter>Engine\Template</Filter>
-    </ClInclude>
-    <ClInclude Include="Changelog.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Printer.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

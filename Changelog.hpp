@@ -1,6 +1,14 @@
 #pragma once
 
 /*
+	Changes in v2.1.8:
+	- Fixed the start offset for UObjectProperty being wrong.
+	- Fixed there not being a proper ";" for the generated "FScriptDelegate" struct.
+	- Fixed the return string for the "GetName" functions in PiecesOfCode being const by mistake in the teamplate.
+	- Fixed the TPair members being private by default in PiecesOfCode in the template.
+	- Fixed the generated UObject_Functions being in the wrong order in the generated sdk.
+	- Fixed the UDelegateProperty offsets being wrong in the template for the generated sdk.
+
 	Changes in v2.1.7:
 	- I forgot to make FNameEntry's fields dynamically generate (whoops), added field register ids for them now in "GameDefines.hpp".
 	- Added the GetEntryPoint and GetOffset functions.
