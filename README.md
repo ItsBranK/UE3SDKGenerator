@@ -1,9 +1,8 @@
-# UE3SDKGenerator v2.1.9
+# UE3SDKGenerator v2.2.0
 
 ### About
 
 A modern C++17 Unreal Engine 3 SDK generator, originally based off of TheFeckless's UE3 SDK Generator.
-
 This project is not fully complete yet, if you encounter any bugs please create a new issue [here](https://github.com/ItsBranK/UE3SDKGenerator/issues).
 
 ### Features
