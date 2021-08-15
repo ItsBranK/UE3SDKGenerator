@@ -12,6 +12,7 @@ namespace Configuration
     const bool UsingOffsets =                           false; // If you're using offsets or FindPattern to find GObjects & GNames,
     const bool UsingDetours =                           true; // If you're goning to be detouring/using the VfTable for process event change this to true, if you're using virtual voids change this to false,
     const bool UsingEnumClasses =                       true; // If you want to use enum classes over just normal enums.
+    const bool PrintFlagEnums =							true; // If you want the EFunctionFlags, EPropertyFlags, and EObjectFlags enum so be generated in the final sdk.
     const std::string EnumClassType =                   "uint8_t"; // Underlying field type if you set UsingEnumClasses to true.
 
     const int32_t CommentSpacer =                       30;

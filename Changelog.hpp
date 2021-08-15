@@ -1,6 +1,16 @@
 #pragma once
 
 /*
+	Changes in v2.1.9:
+	- Fixed the UInterfaceProperty being generated wrong in the final sdk, it no longer says wrong size of previous property.
+	- Fixed the math for "correctElementSize" being wrong if there was an array of objects, it now takes into account the array dimensions.
+	- Fixed the iNative flags being wrong after going through process event.
+	- Added support for generating static functions in classes.
+	- Added an option to print the flag enums to the final sdk in "Configuration.cpp".
+	- Added the "EObjectFlags" enum in GameDefines.
+	- Added an extra safety check for validating globals.
+	- Changed how the "AreGNamesValid" function works.
+
 	Changes in v2.1.8:
 	- Fixed the start offset for UObjectProperty being wrong.
 	- Fixed there not being a proper ";" for the generated "FScriptDelegate" struct.

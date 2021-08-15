@@ -26,6 +26,7 @@ namespace PiecesOfCode
 	extern const std::string UObject_FunctionDescriptions;
 	extern const std::string UObject_Functions;
 	extern const std::string UFunction_Functions;
+	extern const std::string EEnumFlags;
 }
 
 /*

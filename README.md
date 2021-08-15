@@ -1,8 +1,8 @@
-# UE3SDKGenerator v2.1.8
+# UE3SDKGenerator v2.1.9
 
 ### About
 
-A  modern C++17 remake of TheFeckless's UE3 SDK Generator.
+A modern C++17 Unreal Engine 3 SDK generator, originally based off of TheFeckless's UE3 SDK Generator.
 
 This project is not fully complete yet, if you encounter any bugs please create a new issue [here](https://github.com/ItsBranK/UE3SDKGenerator/issues).
 
@@ -24,7 +24,7 @@ Have the option of using virtual voids for Process Event, or just use an index n
 Full support for both x32 bit and x64 bit games, just change the `Alignment` value in `Configuration.cpp`.
 
 - **Enum classes**
-Have the option to generate normal enums or enum classes (underlying type is a unsigned char).
+Have the option to generate normal enums or enum classes as well as their underlying type.
 
 - **Custom spacer widths**
 Customize the spacing for comments, constants, structs, enums, functions, classes, and even the log file.

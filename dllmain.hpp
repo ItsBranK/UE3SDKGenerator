@@ -6,7 +6,7 @@
 /*
 	TO-DO:
 	- Optimization, gotta go fest man!
-	- I reversed TMap but still have no idea how to determine what the key and value objects are, they seem to be always null?
+	- Make look less shit.
 */
 
 namespace Utils

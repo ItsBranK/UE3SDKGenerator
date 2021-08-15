@@ -26,6 +26,7 @@ namespace Configuration
 	extern const bool UsingOffsets;
 	extern const bool UsingDetours;
 	extern const bool UsingEnumClasses;
+	extern const bool PrintFlagEnums;
 	extern const std::string EnumClassType;
 
 	extern const int32_t CommentSpacer;

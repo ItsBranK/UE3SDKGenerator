@@ -143,10 +143,7 @@ namespace Utils
     {
         if (FName::Names()->Num() > 0 && FName::Names()->Max() > FName::Names()->Num())
         {
-            if (FName(0).ToString() == "None")
-            {
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -1301,6 +1298,7 @@ namespace ClassGenerator
                     if (property->ArrayDim > 1)
                     {
                         propertyStream << "[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "]";
+                        correctElementSize *= property->ArrayDim;
                     }
 
                     if (property->IsA(UBoolProperty::StaticClass()))
@@ -1312,22 +1310,54 @@ namespace ClassGenerator
 
                     int32_t offsetError = (property->ElementSize * property->ArrayDim) - (correctElementSize * property->ArrayDim);
 
-                    classStream << "\t";
-                    Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
-                    classStream << propertyType << " " << propertyStream.str() << ";";
-                    Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 1));
-                    classStream << "// " << Printer::Hex(property->Offset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
-
-                    classStream << " (" << Printer::Hex((property->ElementSize * property->ArrayDim), static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << ")";
-                    classStream << " [" << Printer::Hex(property->PropertyFlags, static_cast<uint64_t>(EWidthTypes::WIDTH_PROPERTY)) << "] ";
-
-                    if (property->IsA(UBoolProperty::StaticClass()))
+                    if (property->IsA(UInterfaceProperty::StaticClass()))
                     {
-                        classStream << "[" << Printer::Hex(reinterpret_cast<UBoolProperty*>(property)->BitMask, static_cast<uint64_t>(EWidthTypes::WIDTH_BITMASK)) << "] ";
+                        size_t interfaceSize = Retrievers::GetPropertySize(property);
+
+                        if (offsetError == interfaceSize)
+                        {
+                            offsetError -= interfaceSize;
+                        }
+
+                        classStream << "\t";
+                        Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
+                        classStream << propertyType << " " << propertyStream.str() << "_Object;";
+
+                        Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 8));
+                        classStream << "// " << Printer::Hex(property->Offset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
+                        classStream << " (" << Printer::Hex((property->ElementSize * property->ArrayDim) - interfaceSize, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << ")";
+                        classStream << " [" << Printer::Hex(property->PropertyFlags, static_cast<uint64_t>(EWidthTypes::WIDTH_PROPERTY)) << "] ";
+                        classStream << flagStream.str() << "\n";
+
+                        classStream << "\t";
+                        Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
+                        classStream << propertyType << " " << propertyStream.str() << "_Interface;";
+
+                        Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 11));
+                        classStream << "// " << Printer::Hex(property->Offset + interfaceSize, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
+                        classStream << " (" << Printer::Hex((property->ElementSize * property->ArrayDim) - interfaceSize, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << ")";
+                        classStream << " [" << Printer::Hex(property->PropertyFlags, static_cast<uint64_t>(EWidthTypes::WIDTH_PROPERTY)) << "] ";
+
+                        Printer::FillLeft(classStream, ' ', static_cast<uint64_t>(EWidthTypes::WIDTH_FIELD));
                     }
                     else
                     {
-                        Printer::FillLeft(classStream, ' ', static_cast<uint64_t>(EWidthTypes::WIDTH_FIELD));
+                        classStream << "\t";
+                        Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
+                        classStream << propertyType << " " << propertyStream.str() << ";";
+                        Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 1));
+                        classStream << "// " << Printer::Hex(property->Offset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
+                        classStream << " (" << Printer::Hex((property->ElementSize * property->ArrayDim), static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << ")";
+                        classStream << " [" << Printer::Hex(property->PropertyFlags, static_cast<uint64_t>(EWidthTypes::WIDTH_PROPERTY)) << "] ";
+
+                        if (property->IsA(UBoolProperty::StaticClass()))
+                        {
+                            classStream << "[" << Printer::Hex(reinterpret_cast<UBoolProperty*>(property)->BitMask, static_cast<uint64_t>(EWidthTypes::WIDTH_BITMASK)) << "] ";
+                        }
+                        else
+                        {
+                            Printer::FillLeft(classStream, ' ', static_cast<uint64_t>(EWidthTypes::WIDTH_FIELD));
+                        }
                     }
 
                     classStream << flagStream.str() << "\n";
@@ -1433,7 +1463,7 @@ namespace ClassGenerator
         {
             if (Configuration::UsingDetours)
             {
-                classStream << "\tvoid ProcessEvent(class UFunction* function, void* uParams, void* uResult);\n";
+                classStream << "\tvoid ProcessEvent(class UFunction* uFunction, void* uParams, void* uResult);\n";
             }
             else
             {
@@ -2022,7 +2052,7 @@ namespace FunctionGenerator
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
             {
-                codeStream << "\n\tunsigned short iNative = uFn" << functionName << "->iNative;\n\tuFn" << functionName << "->iNative = 0;\n";
+                codeStream << "\n\tuint16_t iNative = uFn" << functionName << "->iNative;\n\tuFn" << functionName << "->iNative = 0;\n";
             }
 
             if (function->FunctionFlags & EFunctionFlags::FUNC_Native)
@@ -2030,11 +2060,18 @@ namespace FunctionGenerator
                 codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
             }
 
-            codeStream << "\n\tthis->ProcessEvent(uFn" << functionName << ", &" << functionName << "_Params, nullptr);\n";
+            if (function->FunctionFlags & EFunctionFlags::FUNC_Static)
+            {
+                codeStream << "\n\t" << classNameCPP << "::StaticClass()->ProcessEvent(" << "uFn" << functionName << ", &" << functionName << "_Params, nullptr);\n";
+            }
+            else
+            {
+                codeStream << "\n\tthis->ProcessEvent(uFn" << functionName << ", &" << functionName << "_Params, nullptr);\n";
+            }
 
             if (function->FunctionFlags & EFunctionFlags::FUNC_Native)
             {
-                codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
+                codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= " << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
             }
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
@@ -2140,15 +2177,17 @@ namespace FunctionGenerator
             std::sort(propertyParams.begin(), propertyParams.end(), Utils::SortPropertyPair);
             std::sort(propertyOutParams.begin(), propertyOutParams.end(), Utils::SortPropertyPair);
 
+            bool isStatic = function->FunctionFlags & EFunctionFlags::FUNC_Static;
+
             std::string propertyType;
 
             if (propertyReturnParm.first && Retrievers::GetPropertyType(propertyReturnParm.first, propertyType, true) != EPropertyTypes::TYPE_UNKNOWN)
             {
-                functionStream << "\t" << propertyType;
+                functionStream << "\t" << (isStatic ? "static " : "") << propertyType;
             }
             else
             {
-                functionStream << "\tvoid";
+                functionStream << "\t" << (isStatic ? "static " : "") << "void";
             }
 
             Generator::MakeWindowsFunction(functionName);
@@ -2444,6 +2483,15 @@ namespace Generator
         file << "#include <thread>\n";
         file << "#include <vector>\n";
         file << "#include <map>\n\n";
+
+        Printer::Section(file, "Flags");
+
+        if (Configuration::PrintFlagEnums)
+        {
+            file << PiecesOfCode::EEnumFlags;
+        }
+
+        Printer::Section(file, "Globals");
 
         if (Configuration::UsingOffsets)
         {
@@ -2773,7 +2821,7 @@ namespace Generator
                 GNames = reinterpret_cast<TArray<FNameEntry*>*>(GNamesAddress);
             }
 
-            if (Utils::AreGObjectsValid() && Utils::AreGNamesValid())
+            if (GObjects && GNames && Utils::AreGObjectsValid() && Utils::AreGNamesValid())
             {
                 FNameEntry::RegIndex();
                 FNameEntry::RegName();
@@ -2850,7 +2898,7 @@ void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-    //Generator::DumpInstances(true, false, true);
+   // Generator::DumpInstances(true, false, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
