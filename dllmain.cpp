@@ -1279,7 +1279,6 @@ namespace ClassGenerator
                 }
 
                 std::string propertyType;
-                bool alreadyRenamed = false;
 
                 if (Retrievers::GetPropertyType(property, propertyType, false) != EPropertyTypes::TYPE_UNKNOWN)
                 {
