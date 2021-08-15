@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-    std::string GeneratorVersion = "v2.1.9";
+    std::string GeneratorVersion = "v2.2.0";
     std::string GeneratorCredits = "TheFeckless, ItsBranK";
     std::string GeneratorLinks = "www.github.com/itsbrank/UE3SDKGenerator, www.twitter.com/itsbrank";
     std::string GeneratorDirectory = "UE3SDKGenerator";
