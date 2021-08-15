@@ -1297,6 +1297,11 @@ namespace ClassGenerator
 
                     if (property->ArrayDim > 1)
                     {
+                        if (!property->IsA(UInterfaceProperty::StaticClass()))
+                        {
+                            propertyStream << "[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "];";
+                        }
+
                         correctElementSize *= property->ArrayDim;
                     }
 
