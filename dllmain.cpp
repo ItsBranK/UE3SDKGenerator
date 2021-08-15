@@ -1299,7 +1299,7 @@ namespace ClassGenerator
                     {
                         if (!property->IsA(UInterfaceProperty::StaticClass()))
                         {
-                            propertyStream << "[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "];";
+                            propertyStream << "[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "]";
                         }
 
                         correctElementSize *= property->ArrayDim;
@@ -2759,7 +2759,7 @@ namespace Generator
 
                 if (dumpObjects)
                 {
-                    std::ofstream file(fullDirectory / "FullObjectDump.txt");
+                    std::ofstream file(fullDirectory / "ObjectDump.txt");
 
                     uintptr_t offset = Retrievers::GetOffset(reinterpret_cast<uintptr_t>(GObjects));
 
