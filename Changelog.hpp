@@ -1,6 +1,11 @@
 #pragma once
 
 /*
+	Changes in v2.2.0:
+	- Fixed the interface name being wrong if there was an array of them.
+	- Replaced the "dumpObjects" parameter with just "dumpObjectsFull" internally, because why would you even need that option?
+	- Increased the loop size for virtual functions from 256 to 512.
+
 	Changes in v2.1.9:
 	- Fixed the UInterfaceProperty being generated wrong in the final sdk, it no longer says wrong size of previous property.
 	- Fixed the math for "correctElementSize" being wrong if there was an array of objects, it now takes into account the array dimensions.

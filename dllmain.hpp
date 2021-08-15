@@ -96,6 +96,6 @@ namespace Generator
 	void GenerateDefines();
 	void ProcessPackages(std::filesystem::path directory);
 	void GenerateSDK();
-	void DumpInstances(bool dumpNames, bool dumpObjects, bool dumpObjectsFull);
+	void DumpInstances(bool dumpNames, bool dumpObjects);
 	bool Initialize(bool createLogFile);
 }

@@ -1279,6 +1279,7 @@ namespace ClassGenerator
                 }
 
                 std::string propertyType;
+                bool alreadyRenamed = false;
 
                 if (Retrievers::GetPropertyType(property, propertyType, false) != EPropertyTypes::TYPE_UNKNOWN)
                 {
@@ -1297,7 +1298,6 @@ namespace ClassGenerator
 
                     if (property->ArrayDim > 1)
                     {
-                        propertyStream << "[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "]";
                         correctElementSize *= property->ArrayDim;
                     }
 
@@ -1321,7 +1321,16 @@ namespace ClassGenerator
 
                         classStream << "\t";
                         Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
-                        classStream << propertyType << " " << propertyStream.str() << "_Object;";
+                        classStream << propertyType << " " << propertyStream.str();
+
+                        if (property->ArrayDim > 1)
+                        {
+                            classStream << "_Object[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "];";
+                        }
+                        else
+                        {
+                            classStream << "_Object;";
+                        }
 
                         Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 8));
                         classStream << "// " << Printer::Hex(property->Offset, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
@@ -1331,7 +1340,16 @@ namespace ClassGenerator
 
                         classStream << "\t";
                         Printer::FillLeft(classStream, ' ', Configuration::ClassSpacer);
-                        classStream << propertyType << " " << propertyStream.str() << "_Interface;";
+                        classStream << propertyType << " " << propertyStream.str();
+
+                        if (property->ArrayDim > 1)
+                        {
+                            classStream << "_Interface[" << Printer::Hex(property->ArrayDim, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << "];";
+                        }
+                        else
+                        {
+                            classStream << "_Interface;";
+                        }
 
                         Printer::FillRight(classStream, ' ', Configuration::ClassSpacer - (propertyStream.str().size() + 11));
                         classStream << "// " << Printer::Hex(property->Offset + interfaceSize, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE));
@@ -1732,7 +1750,7 @@ namespace FunctionGenerator
         {
             file << "\n\t// Virtual Functions\n\n";
 
-            for (int32_t index = 0; index < 256; index++)
+            for (int32_t index = 0; index < 512; index++)
             {
                 uintptr_t virtualFunction = reinterpret_cast<uintptr_t*>(UObject::StaticClass()->VfTableObject.Dummy)[index];
 
@@ -2695,7 +2713,7 @@ namespace Generator
         }
     }
 
-    void DumpInstances(bool dumpNames, bool dumpObjects, bool dumpObjectsFull)
+    void DumpInstances(bool dumpNames, bool dumpObjects)
     {
         if (Initialize(false))
         {
@@ -2717,7 +2735,7 @@ namespace Generator
                     file << "GNames: " << Printer::Hex(reinterpret_cast<uintptr_t>(GNames), sizeof(GNames)) << "\n";
                     file << "Offset: " << Printer::Hex(offset, sizeof(offset)) << "\n\n";
 
-                    for (const FNameEntry* nameEntry : *FName::Names())
+                    for (FNameEntry* nameEntry : *FName::Names())
                     {
                         if (nameEntry)
                         {
@@ -2736,34 +2754,6 @@ namespace Generator
                 }
 
                 if (dumpObjects)
-                {
-                    std::ofstream file(fullDirectory / "NameDump.txt");
-
-                    uintptr_t offset = Retrievers::GetOffset(reinterpret_cast<uintptr_t>(GObjects));
-
-                    file << "Entry Point: " << Printer::Hex(entryPoint, sizeof(entryPoint)) << "\n";
-                    file << "GObjects: " << Printer::Hex(reinterpret_cast<uintptr_t>(GObjects), sizeof(GObjects)) << "\n";
-                    file << "Offset: " << Printer::Hex(offset, sizeof(offset)) << "\n\n";
-
-                    for (UObject* object : *UObject::GObjObjects())
-                    {
-                        if (object)
-                        {
-                            std::string objectName = object->GetName();
-
-                            file << "UObject[";
-                            Printer::FillRight(file, '0', 6);
-                            file << std::to_string(object->ObjectInternalInteger) << "] ";
-                            file << objectName << " ";
-                            Printer::FillRight(file, ' ', 50 - objectName.length());
-                            file << Printer::Hex(reinterpret_cast<uintptr_t>(object), sizeof(object)) << "\n";
-                        }
-                    }
-
-                    file.close();
-                }
-
-                if (dumpObjectsFull)
                 {
                     std::ofstream file(fullDirectory / "FullObjectDump.txt");
 
@@ -2898,7 +2888,7 @@ void OnAttach(HMODULE hModule)
 {
     DisableThreadLibraryCalls(hModule);
     Generator::GenerateSDK();
-   // Generator::DumpInstances(true, false, true);
+    //Generator::DumpInstances(true, true);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
