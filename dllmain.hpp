@@ -3,12 +3,6 @@
 #include "Printer.hpp"
 #include "Engine/Engine.hpp"
 
-/*
-	TO-DO:
-	- Optimization, gotta go fest man!
-	- Make look less shit.
-*/
-
 namespace Utils
 {
 	void Messagebox(const std::string& message, const std::string& title, uint64_t flags);

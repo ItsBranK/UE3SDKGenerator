@@ -1,6 +1,11 @@
 #pragma once
 
 /*
+	Changes in v2.2.1:
+	- Added a message box popup to tell the user if generating virtual functions did not work correctly.
+	- Fixed functions being static if "FUNC_AllFlags" was set, it's not suppose to be static if that's the case. Thanks tim sweeney.
+	- Fixed not properly clearing the iNative bitflags and setting them back for functions.
+
 	Changes in v2.2.0:
 	- Fixed the interface name being wrong if there was an array of them.
 	- Replaced the "dumpObjects" parameter with just "dumpObjectsFull" internally, because why would you even need that option?

@@ -1774,6 +1774,7 @@ namespace FunctionGenerator
         else
         {
             file << "\n\t// FIX PROCESS EVENT IN CONFIGURATION.CPP";
+            Utils::Messagebox("Warning: Process event is not configured correctly in \"Configuration.cpp\"!", "UE3SDKGenerator", MB_ICONWARNING | MB_OK);
         }
     }
 
@@ -1837,7 +1838,7 @@ namespace FunctionGenerator
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
             {
-                codeStream << " iNative [" << Printer::Hex(function->iNative, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << "]";
+                codeStream << " iNative[" << Printer::Hex(function->iNative, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << "]";
             }
 
             std::vector<std::pair<UProperty*, std::string>> propertyParams;
@@ -2072,17 +2073,20 @@ namespace FunctionGenerator
                 }
             }
 
-            if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
+            bool hasNativeIndex = function->iNative > 0 ? true : false;
+            bool isNativeFunction = function->FunctionFlags & EFunctionFlags::FUNC_Native;
+
+            if (isNativeFunction && hasNativeIndex)
             {
                 codeStream << "\n\tuint16_t iNative = uFn" << functionName << "->iNative;\n\tuFn" << functionName << "->iNative = 0;\n";
             }
 
-            if (function->FunctionFlags & EFunctionFlags::FUNC_Native)
+            if (isNativeFunction)
             {
-                codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
+                codeStream << "\n\tuFn" << functionName << "->FunctionFlags &= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
             }
 
-            if (function->FunctionFlags & EFunctionFlags::FUNC_Static)
+            if ((function->FunctionFlags & EFunctionFlags::FUNC_Static) && (function->FunctionFlags != EFunctionFlags::FUNC_AllFlags))
             {
                 codeStream << "\n\t" << classNameCPP << "::StaticClass()->ProcessEvent(" << "uFn" << functionName << ", &" << functionName << "_Params, nullptr);\n";
             }
@@ -2091,12 +2095,12 @@ namespace FunctionGenerator
                 codeStream << "\n\tthis->ProcessEvent(uFn" << functionName << ", &" << functionName << "_Params, nullptr);\n";
             }
 
-            if (function->FunctionFlags & EFunctionFlags::FUNC_Native)
+            if (isNativeFunction)
             {
                 codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= " << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
             }
 
-            if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
+            if (isNativeFunction && hasNativeIndex)
             {
                 codeStream << "\n\tuFn" << functionName << "->iNative = iNative;\n";
             }
@@ -2199,7 +2203,7 @@ namespace FunctionGenerator
             std::sort(propertyParams.begin(), propertyParams.end(), Utils::SortPropertyPair);
             std::sort(propertyOutParams.begin(), propertyOutParams.end(), Utils::SortPropertyPair);
 
-            bool isStatic = function->FunctionFlags & EFunctionFlags::FUNC_Static;
+            bool isStatic = (function->FunctionFlags & EFunctionFlags::FUNC_Static) && (function->FunctionFlags != EFunctionFlags::FUNC_AllFlags);
 
             std::string propertyType;
 
