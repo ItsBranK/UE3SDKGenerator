@@ -2083,7 +2083,7 @@ namespace FunctionGenerator
 
             if (isNativeFunction)
             {
-                codeStream << "\n\tuFn" << functionName << "->FunctionFlags &= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
+                codeStream << "\n\tuFn" << functionName << "->FunctionFlags |= ~" << Printer::Hex(EFunctionFlags::FUNC_Native, static_cast<uint64_t>(EWidthTypes::WIDTH_NONE)) << ";\n";
             }
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Static) && (function->FunctionFlags != EFunctionFlags::FUNC_AllFlags))
