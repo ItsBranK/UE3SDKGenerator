@@ -12,8 +12,8 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{c2909db8-7df0-479c-9864-696d3e87ee8f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Rocket League">
-      <UniqueIdentifier>{6a793848-84ba-4b9d-9ae7-d5c1f395fa99}</UniqueIdentifier>
+    <Filter Include="Engine\Template">
+      <UniqueIdentifier>{48a0f962-cdfe-4c10-ab01-de19f80612f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -23,20 +23,20 @@
     <ClCompile Include="Printer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Rocket League\GameDefines.cpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rocket League\Configuration.cpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Rocket League\PiecesOfCode.cpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Template\Configuration.cpp">
+      <Filter>Engine\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Template\GameDefines.cpp">
+      <Filter>Engine\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Template\PiecesOfCode.cpp">
+      <Filter>Engine\Template</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,20 +49,20 @@
     <ClInclude Include="Printer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Rocket League\GameDefines.hpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rocket League\PiecesOfCode.hpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rocket League\Configuration.hpp">
-      <Filter>Engine\Rocket League</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Engine.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Changelog.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Template\Configuration.hpp">
+      <Filter>Engine\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Template\GameDefines.hpp">
+      <Filter>Engine\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Template\PiecesOfCode.hpp">
+      <Filter>Engine\Template</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
