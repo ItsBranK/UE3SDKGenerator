@@ -1,6 +1,12 @@
 #pragma once
 
 /*
+	Changes in v2.2.2:
+	- Changed some cast types from reinterpret _cast to safer ones in some places.
+	- Fixed the wrong "correctElementSize" value being set if there was an array of objects for generated structs, this is the same fix as the one in v2.1.9 I just forgot to make it apply to script structs.
+	- Fixed UInterfaceProperty's being generated wrong in structs, again same fix as the one in v2.1.9 but applied to script structs.
+	- Fixed a spacing issue with the includes in the generated "GameDefines.hpp" file as well as in generated script structs.
+
 	Changes in v2.2.1:
 	- Added a message box popup to tell the user if generating virtual functions did not work correctly.
 	- Fixed functions being static if "FUNC_AllFlags" was set, it's not suppose to be static if that's the case. Thanks tim sweeney.
