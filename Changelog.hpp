@@ -1,6 +1,10 @@
 #pragma once
 
 /*
+	Changes in v2.2.3:
+	- Changed the format for some of the constructors in "GameDefines.hpp" as well in "PiecesOfCode.cpp".
+	- Fixed the "IsValid" function for FNames in the generated sdk.
+
 	Changes in v2.2.2:
 	- Changed some cast types from reinterpret _cast to safer ones in some places.
 	- Fixed the wrong "correctElementSize" value being set if there was an array of objects for generated structs, this is the same fix as the one in v2.1.9 I just forgot to make it apply to script structs.

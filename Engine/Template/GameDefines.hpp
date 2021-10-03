@@ -351,12 +351,8 @@ private:
 	int32_t ArrayMax;
 
 public:
-	TArray()
+	TArray() : ArrayData(nullptr), ArrayCount(0), ArrayMax(0)
 	{
-		ArrayData = nullptr;
-		ArrayCount = 0;
-		ArrayMax = 0;
-
 		//ReAllocate(sizeof(ElementType));
 	}
 
@@ -673,7 +669,7 @@ namespace Fields
 	void AssertField(const ClassField& classField);
 }
 
-#define REGISTER_FIELD(type, method, id) static void Reg##method(){Fields::AssertField(ClassField(id, sizeof(type)));}
+#define REGISTER_FIELD(type, method, id) static void Reg##method(){ Fields::AssertField(ClassField(id, sizeof(type))); }
 
 /*
 # ========================================================================================= #
@@ -751,17 +747,9 @@ private:
 	int32_t			InstanceNumber;									// 0x0004 (0x04)
 
 public:
-	FName()
-	{
-		FNameEntryId = 0;
-		InstanceNumber = 0;
-	}
+	FName() : FNameEntryId(0), InstanceNumber(0) { }
 
-	FName(const int32_t id)
-	{
-		FNameEntryId = id;
-		InstanceNumber = 0;
-	}
+	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) { }
 
 #ifdef CHARACTER_UTF16
 	FName(const ElementPointer nameToFind)
@@ -933,12 +921,7 @@ private:
 	int32_t			ArrayMax;										// 0x000C (0x04)
 
 public:
-	FString()
-	{
-		ArrayData = nullptr;
-		ArrayCount = 0;
-		ArrayMax = 0;
-	}
+	FString() : ArrayData(nullptr), ArrayCount(0), ArrayMax(0) { }
 
 #ifdef CHARACTER_UTF16
 	FString(ElementPointer other)
