@@ -1,6 +1,10 @@
 #pragma once
 
 /*
+	Changes in v2.2.4:
+	- Added the "FinalAlignment" option in "Configuration.hpp/cpp", this lets you set a custom byte alignment for classes/structs in the final sdk.
+	- Added an option/comment in "Configuration.hpp" for the "EAlignment" enum.
+
 	Changes in v2.2.3:
 	- Changed the format for some of the constructors in "GameDefines.hpp" as well in "PiecesOfCode.cpp".
 	- Fixed the "IsValid" function for FNames in the generated sdk.

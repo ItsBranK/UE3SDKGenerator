@@ -83,7 +83,7 @@ namespace Printer
         if (pragmaPush)
         {
             stream << "\n#ifdef _MSC_VER\n";
-            stream << "\t#pragma pack(push, 0x" + std::to_string(static_cast<uint8_t>(Configuration::Alignment)) + ")\n";
+            stream << "\t#pragma pack(push, 0x" + std::to_string(Configuration::FinalAlignment) + ")\n";
             stream << "#endif\n";
         }
     }

@@ -12,8 +12,10 @@
 #define CHARACTER_UTF16
 //#define CHARACTER_UTF8
 
+// This CAN be customized to anything you want really, just remember "FinalAlignment" only applies to the generated sdk.
 enum class EAlignment : int32_t
 {
+	NONE = 0x1,
 	X32BIT = 0x4,
 	X64BIT = 0x8
 };
@@ -36,6 +38,7 @@ namespace Configuration
 	extern const int32_t FunctionSpacer;
 	extern const int32_t ClassSpacer;
 	extern const EAlignment Alignment;
+	extern const int32_t FinalAlignment;
 
 	extern const int32_t ProcessEventIndex;
 	extern const std::string ProcessEventString;
