@@ -6,20 +6,22 @@
 # ========================================================================================= #
 */
 
-ClassField::ClassField()
+ClassField::ClassField() :
+	Id(EFieldIds::UNKNOWN),
+	Type("uint8_t UNKNOWN_CLASS_FIELD[0x1];"),
+	Offset(0x0),
+	Size(1)
 {
-	Id = EFieldIds::UNKNOWN;
-	Type = "uint8_t UNKNOWN_CLASS_FIELD[0x1]";
-	Offset = 0x0;
-	Size = 1;
+
 }
 
-ClassField::ClassField(EFieldIds id, size_t sizeOverride)
+ClassField::ClassField(EFieldIds id, size_t sizeOverride) :
+	Id(id),
+	Type(Fields::IdToType[id]),
+	Offset(Fields::GetOffset(id)),
+	Size(sizeOverride)
 {
-	Id = id;
-	Type = Fields::IdToType[id];
-	Offset = Fields::GetOffset(id);
-	Size = sizeOverride;
+
 }
 
 ClassField::~ClassField() { }
@@ -37,7 +39,7 @@ namespace Fields
 {
 	std::vector<std::function<void()>> FieldMethods{};
 
-	std::map<EFieldIds, std::string> IdToType
+	std::map<EFieldIds, std::string> IdToType =
 	{
 		{ EFieldIds::FNAMEENTRY_INDEX, "int32_t Index;" },
 		{ EFieldIds::FNAMEENTRY_NAME_UTF16, "wchar_t Name[0x400];" },
@@ -70,7 +72,7 @@ namespace Fields
 		{ EFieldIds::UDELEGATEPROPERTY_NAME, "struct FName Name;" },
 		{ EFieldIds::UBYTEPROPERTY_ENUM, "class UEnum* Enum;" },
 		{ EFieldIds::UBOOLPROPERTY_BITMASK, "uint64_t BitMask;" },
-		{ EFieldIds::UARRAYPROPERTY_INNTER, "class UProperty* Inner;" },
+		{ EFieldIds::UARRAYPROPERTY_INNTER, "class UProperty* Inner;" }
 	};
 
 	std::map<EFieldIds, ClassField> GlobalFields{};
@@ -143,9 +145,9 @@ namespace Fields
 			return offsetof(UBoolProperty, BitMask);
 		case EFieldIds::UARRAYPROPERTY_INNTER:
 			return offsetof(UArrayProperty, Inner);
+		default:
+			return 0x0;
 		}
-
-		return 0x0;
 	}
 
 	std::map<std::uintptr_t, ClassField> GetOrderedFields(EClassTypes classType, size_t& classSize, size_t& startOffset)
@@ -421,7 +423,7 @@ bool UObject::IsA(class UClass* uClass)
 	return false;
 }
 
-bool UObject::IsA(int objInternalInteger)
+bool UObject::IsA(int32_t objInternalInteger)
 {
 	UClass* uClass = UObject::GObjObjects()->At(objInternalInteger)->Class;
 

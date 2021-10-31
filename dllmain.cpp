@@ -1662,7 +1662,7 @@ namespace ParameterGenerator
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
             {
-                parameterStream << " iNative[" << Printer::Hex(function->iNative, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << "]";
+                parameterStream << " (iNative[" << std::to_string(function->iNative) << "])";
             }
 
             if (function->FunctionFlags & EFunctionFlags::FUNC_Exec) { propertyStream << "exec"; }
@@ -1894,7 +1894,7 @@ namespace FunctionGenerator
 
             if ((function->FunctionFlags & EFunctionFlags::FUNC_Native) && function->iNative)
             {
-                codeStream << " iNative[" << Printer::Hex(function->iNative, static_cast<uint64_t>(EWidthTypes::WIDTH_SIZE)) << "]";
+                codeStream << " (iNative[" << std::to_string(function->iNative) << "])";
             }
 
             std::vector<std::pair<UProperty*, std::string>> propertyParams;
@@ -2134,7 +2134,7 @@ namespace FunctionGenerator
 
             if (isNativeFunction && hasNativeIndex)
             {
-                codeStream << "\n\tuint16_t iNative = uFn" << functionName << "->iNative;\n\tuFn" << functionName << "->iNative = 0;\n";
+                codeStream << "\n\tuint16_t iNativeIndex = uFn" << functionName << "->iNative;\n\tuFn" << functionName << "->iNative = 0;\n";
             }
 
             if (isNativeFunction)
@@ -2158,7 +2158,7 @@ namespace FunctionGenerator
 
             if (isNativeFunction && hasNativeIndex)
             {
-                codeStream << "\n\tuFn" << functionName << "->iNative = iNative;\n";
+                codeStream << "\n\tuFn" << functionName << "->iNative = iNativeIndex;\n";
             }
 
             if (propertyOutParams.size() > 0)
@@ -2647,7 +2647,7 @@ namespace Generator
         Printer::Section(file, "Initialize Global Variables");
 
         file << "TArray<class UObject*>* GObjects{};\n";
-        file << "TArray<struct FNameEntry*>* GNames{};";
+        file << "TArray<struct FNameEntry*>* GNames{};\n\n";
 
         Printer::Footer(file, false);
 

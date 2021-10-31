@@ -1,6 +1,12 @@
 #pragma once
 
 /*
+	Changes in v2.2.5:
+	- Fixed a comment issue in the generated "GameDefines.cpp" file.
+	- Changed the "EClassTypes", "EFieldIds", "EPropertyTypes", enums so their values are assigned by the compiler instead; this is for easier modifying in the future if needed.
+	- Changed the constuctors for the "ClassField" class in "GameDefines.cpp", along with slightly modifying some of the members in the "Fields" namespace.
+	- Changed the commenting for "iNative".
+ 
 	Changes in v2.2.4:
 	- Added the "FinalAlignment" option in "Configuration.hpp/cpp", this lets you set a custom byte alignment for classes/structs in the final sdk.
 	- Added an option/comment in "Configuration.hpp" for the "EAlignment" enum.
@@ -12,7 +18,7 @@
 	Changes in v2.2.2:
 	- Changed some cast types from reinterpret _cast to safer ones in some places.
 	- Fixed the wrong "correctElementSize" value being set if there was an array of objects for generated structs, this is the same fix as the one in v2.1.9 I just forgot to make it apply to script structs.
-	- Fixed UInterfaceProperty's being generated wrong in structs, again same fix as the one in v2.1.9 but applied to script structs.
+	- Fixed UInterfaceProperty's being generated wrong in structs, again same fix as the one in v2.1.9 but applied to script structs. (not tested)
 	- Fixed a spacing issue with the includes in the generated "GameDefines.hpp" file as well as in generated script structs.
 
 	Changes in v2.2.1:

@@ -889,7 +889,7 @@ namespace PiecesOfCode
 		"\t}\n"
 		"\tstatic class UClass* FindClass(const std::string& classFullName);\n"
 		"\tbool IsA(class UClass* uClass);\n"
-		"\tbool IsA(int objInternalInteger);\n\n";
+		"\tbool IsA(int32_t objInternalInteger);\n\n";
 
 	const std::string UObject_Functions =
 		"TArray<class UObject*>* UObject::GObjObjects()\n"
@@ -1014,7 +1014,7 @@ namespace PiecesOfCode
 		"\treturn false;\n"
 		"}\n"
 		"\n"
-		"bool UObject::IsA(int objInternalInteger)\n"
+		"bool UObject::IsA(int32_t objInternalInteger)\n"
 		"{\n"
 		"\tUClass* uClass = UObject::GObjObjects()->At(objInternalInteger)->Class;\n"
 		"\n"
