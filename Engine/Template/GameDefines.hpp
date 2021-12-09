@@ -490,6 +490,7 @@ class TMap
 private:
 	class TPair
 	{
+	public:
 		TKey Key;
 		TValue Value;
 		int32_t* HashNext;
