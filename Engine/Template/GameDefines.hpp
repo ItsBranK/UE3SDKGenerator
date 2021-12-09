@@ -693,7 +693,7 @@ public:
 #endif
 
 public:
-	FNameEntry() : Flags(0), Index(-1) {}
+	FNameEntry() {}
 	~FNameEntry() {}
 
 public:
@@ -751,12 +751,12 @@ private:
 	int32_t			InstanceNumber;									// 0x0004 (0x04)
 
 public:
-	FName() : FNameEntryId(-1), InstanceNumber(0) {}
+	FName() : FNameEntryId(0), InstanceNumber(0) {}
 
 	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) {}
 
 #ifdef CHARACTER_UTF16
-	FName(const ElementPointer nameToFind) : FNameEntryId(-1), InstanceNumber(0)
+	FName(const ElementPointer nameToFind) : FNameEntryId(0), InstanceNumber(0)
 	{
 		static std::vector<int32_t> nameCache{};
 
@@ -787,7 +787,7 @@ public:
 #endif
 
 #ifdef CHARACTER_UTF8
-	FName(ElementPointer nameToFind) : FNameEntryId(-1), InstanceNumber(0)
+	FName(ElementPointer nameToFind) : FNameEntryId(0), InstanceNumber(0)
 	{
 		static std::vector<int32_t> nameCache{};
 
