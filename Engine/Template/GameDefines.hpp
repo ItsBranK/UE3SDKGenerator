@@ -460,7 +460,6 @@ private:
 	void ReAllocate(int32_t newArrayMax)
 	{
 		ElementPointer newArrayData = (ElementPointer)::operator new(newArrayMax * sizeof(ElementType));
-
 		int32_t newNum = ArrayCount;
 
 		if (newArrayMax < newNum)
@@ -538,7 +537,7 @@ public:
 		*this = *reinterpret_cast<TMap<TKey, TValue>*>(&fMap);
 	}
 
-	~TMap() { }
+	~TMap() {}
 
 public:
 	ElementConstReference operator[](const int32_t index) const
@@ -693,6 +692,10 @@ public:
 #endif
 
 public:
+	FNameEntry() : Flags(0), Index(-1) {}
+	~FNameEntry() {}
+
+public:
 	int32_t GetIndex() const
 	{
 		return Index;
@@ -747,9 +750,9 @@ private:
 	int32_t			InstanceNumber;									// 0x0004 (0x04)
 
 public:
-	FName() : FNameEntryId(0), InstanceNumber(0) { }
+	FName() : FNameEntryId(-1), InstanceNumber(0) {}
 
-	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) { }
+	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) {}
 
 #ifdef CHARACTER_UTF16
 	FName(const ElementPointer nameToFind)
@@ -819,7 +822,7 @@ public:
 	}
 #endif
 
-	~FName() { }
+	~FName() {}
 
 public:
 	static class TArray<struct FNameEntry*>* Names()
@@ -884,7 +887,7 @@ public:
 	}
 
 public:
-	struct FName operator=(const struct FName& other)
+	struct FName& operator=(const struct FName& other)
 	{
 		FNameEntryId = other.FNameEntryId;
 		InstanceNumber = other.InstanceNumber;
@@ -921,15 +924,11 @@ private:
 	int32_t			ArrayMax;										// 0x000C (0x04)
 
 public:
-	FString() : ArrayData(nullptr), ArrayCount(0), ArrayMax(0) { }
+	FString() : ArrayData(nullptr), ArrayCount(0), ArrayMax(0) {}
 
 #ifdef CHARACTER_UTF16
-	FString(ElementPointer other)
+	FString(ElementPointer other) : ArrayData(nullptr), ArrayCount(0), ArrayMax(0)
 	{
-		ArrayData = nullptr;
-		ArrayCount = 0;
-		ArrayMax = 0;
-
 		ArrayMax = ArrayCount = *other ? (wcslen(other) + 1) : 0;
 
 		if (ArrayCount > 0)
@@ -940,12 +939,8 @@ public:
 #endif
 
 #ifdef CHARACTER_UTF8
-	FString(ElementPointer other)
+	FString(ElementPointer other) : ArrayData(nullptr), ArrayCount(0), ArrayMax(0)
 	{
-		ArrayData = nullptr;
-		ArrayCount = 0;
-		ArrayMax = 0;
-
 		ArrayMax = ArrayCount = *other ? (strlen(other) + 1) : 0;
 
 		if (ArrayCount > 0)
@@ -955,7 +950,7 @@ public:
 	}
 #endif
 
-	~FString() { }
+	~FString() {}
 
 public:
 #ifdef CHARACTER_UTF16
@@ -986,11 +981,11 @@ public:
 
 	bool IsValid() const
 	{
-		return !!ArrayData;
+		return (!!ArrayData);
 	}
 
 #ifdef CHARACTER_UTF16
-	FString operator=(ElementPointer other)
+	class FString& operator=(ElementPointer other)
 	{
 		if (ArrayData != other)
 		{
@@ -1007,7 +1002,7 @@ public:
 #endif
 
 #ifdef CHARACTER_UTF8
-	FString operator=(ElementPointer other)
+	class FString& operator=(ElementPointer other)
 	{
 		if (ArrayData != other)
 		{

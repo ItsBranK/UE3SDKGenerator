@@ -1,6 +1,10 @@
 #pragma once
 
 /*
+	Changes in v2.2.6:
+	- Changed/cleaned up some of the fields in "GameDefines.hpp", as well as in "PiecesOfCode.cpp".
+	- Added default constructors and deconstructors for FNameEntry.
+
 	Changes in v2.2.5:
 	- Fixed a comment issue in the generated "GameDefines.cpp" file.
 	- Changed the "EClassTypes", "EFieldIds", "EPropertyTypes", enums so their values are assigned by the compiler instead; this is for easier modifying in the future if needed.

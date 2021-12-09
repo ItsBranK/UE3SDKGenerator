@@ -22,7 +22,7 @@ namespace Configuration
     const int32_t FunctionSpacer =                      50;
     const int32_t ClassSpacer =                         50;
     const EAlignment Alignment =                        EAlignment::X64BIT;
-    const int32_t FinalAlignment =			0x4; // Alignment used in the final generated sdk, this defines fields byte class/structs alignment.
+    const int32_t FinalAlignment =			            0x4; // Alignment used in the final generated sdk, this defines class/struct alignment.
 
     const int32_t ProcessEventIndex =                   0; // Position where the Process Event function is in UObject's VfTable.
     const std::string ProcessEventString =              "null";
