@@ -755,12 +755,9 @@ public:
 	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) {}
 
 #ifdef CHARACTER_UTF16
-	FName(const ElementPointer nameToFind)
+	FName(const ElementPointer nameToFind) : FNameEntryId(-1), InstanceNumber(0)
 	{
 		static std::vector<int32_t> nameCache{};
-
-		FNameEntryId = 0;
-		InstanceNumber = 0;
 
 		for (int32_t entryId : nameCache)
 		{
@@ -789,12 +786,9 @@ public:
 #endif
 
 #ifdef CHARACTER_UTF8
-	FName(ElementPointer nameToFind)
+	FName(ElementPointer nameToFind) : FNameEntryId(-1), InstanceNumber(0)
 	{
 		static std::vector<int32_t> nameCache{};
-
-		FNameEntryId = 0;
-		InstanceNumber = 0;
 
 		for (int32_t entryId : nameCache)
 		{
