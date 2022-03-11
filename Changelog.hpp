@@ -1,6 +1,10 @@
 #pragma once
 
 /*
+	Changes in v2.2.7:
+	- Fixed params labeled both "CPF_Parm" and "CPF_OutParm" incorrectly initializing before process event.
+	- Changed some of the cast types in "GameDefines.cpp", as well as in "PiecesOfCode.cpp" to match that.
+
 	Changes in v2.2.6:
 	- Changed/cleaned up some of the fields in "GameDefines.hpp", as well as in "PiecesOfCode.cpp".
 	- Added default constructors and deconstructors for FNameEntry.

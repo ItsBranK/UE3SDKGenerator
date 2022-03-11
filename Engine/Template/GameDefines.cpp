@@ -304,7 +304,7 @@ std::string UObject::GetNameCPP()
 
 	if (this->IsA(UClass::StaticClass()))
 	{
-		UClass* uClass = reinterpret_cast<UClass*>(this);
+		UClass* uClass = static_cast<UClass*>(this);
 
 		while (uClass)
 		{
@@ -321,7 +321,7 @@ std::string UObject::GetNameCPP()
 				break;
 			}
 
-			uClass = reinterpret_cast<UClass*>(uClass->SuperField);
+			uClass = static_cast<UClass*>(uClass->SuperField);
 		}
 	}
 	else
@@ -394,7 +394,7 @@ class UClass* UObject::FindClass(const std::string& classFullName)
 
 				if (objectFullName.find("Class") == 0)
 				{
-					foundClasses[objectFullName] = reinterpret_cast<UClass*>(uObject);
+					foundClasses[objectFullName] = static_cast<UClass*>(uObject);
 				}
 			}
 		}
@@ -412,7 +412,7 @@ class UClass* UObject::FindClass(const std::string& classFullName)
 
 bool UObject::IsA(class UClass* uClass)
 {
-	for (UClass* uSuperClass = this->Class; uSuperClass; uSuperClass = reinterpret_cast<UClass*>(uSuperClass->SuperField))
+	for (UClass* uSuperClass = this->Class; uSuperClass; uSuperClass = static_cast<UClass*>(uSuperClass->SuperField))
 	{
 		if (uSuperClass == uClass)
 		{
@@ -450,7 +450,7 @@ class UFunction* UFunction::FindFunction(const std::string& functionFullName)
 
 				if (objectFullName.find("Function") == 0)
 				{
-					foundFunctions[objectFullName] = reinterpret_cast<UFunction*>(uObject);
+					foundFunctions[objectFullName] = static_cast<UFunction*>(uObject);
 				}
 			}
 		}

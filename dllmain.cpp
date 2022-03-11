@@ -22,18 +22,18 @@ namespace Utils
 
     uintptr_t FindPattern(HMODULE module, const uint8_t* pattern, const char* mask)
     {
-        MODULEINFO info = { };
-        GetModuleInformation(GetCurrentProcess(), module, &info, sizeof(MODULEINFO));
+        MODULEINFO miInfos = { NULL };
+        GetModuleInformation(GetCurrentProcess(), module, &miInfos, sizeof(MODULEINFO));
 
         uintptr_t start = reinterpret_cast<uintptr_t>(module);
-        size_t length = info.SizeOfImage;
+        size_t length = miInfos.SizeOfImage;
 
         size_t pos = 0;
         size_t maskLength = std::strlen(mask) - 1;
 
         for (uintptr_t retAddress = start; retAddress < start + length; retAddress++)
         {
-            if (*reinterpret_cast<unsigned char*>(retAddress) == pattern[pos] || mask[pos] == '?')
+            if (*reinterpret_cast<uint8_t*>(retAddress) == pattern[pos] || mask[pos] == '?')
             {
                 if (pos == maskLength)
                 {
@@ -1692,7 +1692,6 @@ namespace ParameterGenerator
             for (size_t i = 0; i < vProperty.size(); i++)
             {
                 UProperty* property = vProperty[i];
-
                 std::string propertyType;
 
                 if (Retrievers::GetPropertyType(property, propertyType, true) != EPropertyTypes::TYPE_UNKNOWN)
@@ -2123,7 +2122,7 @@ namespace FunctionGenerator
                         }
                         else if (!Utils::IsStructProperty(propertyTypeResult))
                         {
-                            codeStream << "\t" << property.second << " = " << functionName << "_Params." << property.second << ";\n";
+                            codeStream << "\t" << functionName << "_Params." << " = " << property.second << ";\n";
                         }
                     }
                 }

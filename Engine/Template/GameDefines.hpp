@@ -1104,7 +1104,7 @@ public:
 			{
 				if (uObject->GetFullName() == objectFullName)
 				{
-					return reinterpret_cast<T*>(uObject);
+					return static_cast<T*>(uObject);
 				}
 			}
 		}
