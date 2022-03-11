@@ -2122,7 +2122,7 @@ namespace FunctionGenerator
                         }
                         else if (!Utils::IsStructProperty(propertyTypeResult))
                         {
-                            codeStream << "\t" << functionName << "_Params." << " = " << property.second << ";\n";
+                            codeStream << "\t" << functionName << "_Params." << property.second << " = " << property.second << ";\n";
                         }
                     }
                 }
