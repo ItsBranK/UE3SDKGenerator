@@ -24,7 +24,7 @@ namespace Configuration
     const EAlignment Alignment =                        EAlignment::X64BIT;
     const int32_t FinalAlignment =			            0x4; // Alignment used in the final generated sdk, this defines class/struct alignment.
 
-    const int32_t ProcessEventIndex =                   0; // Position where the Process Event function is in UObject's VfTable.
+    const int32_t ProcessEventIndex =                   -1; // Position where the Process Event function is in UObject's VfTable.
     const std::string ProcessEventString =              "null";
     const uint8_t* ProcessEventPattern =                (uint8_t*)"null";
     const char* ProcessEventMask =                      (char*)"null";
@@ -42,7 +42,7 @@ namespace Configuration
     const std::string GameName =                        "Template";
     const std::string GameNameShort =                   "TSDK";
     const std::string GameVersion =                     "1.0.0.0";
-    const std::filesystem::path GeneratorDirectory =    "E:\\Steam\\steamapps\\common\\Template\\UE3SDKGenerator";
+    const std::filesystem::path GeneratorDirectory =    "I_FORGOT_TO_SET_A_PATH";
 }
 
 /*

@@ -1,4 +1,4 @@
-# UE3SDKGenerator v2.2.7
+# UE3SDKGenerator v2.2.8
 
 ### About
 

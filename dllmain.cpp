@@ -2,7 +2,7 @@
 
 namespace Utils
 {
-    void Messagebox(const std::string& message, const std::string& title, uint64_t flags)
+    void Messagebox(const std::string& message, const std::string& title, uint32_t flags)
     {
         MessageBoxA(NULL, message.c_str(), title.c_str(), flags);
     }
@@ -1800,9 +1800,14 @@ namespace FunctionGenerator
         {
             processEventAddress = Utils::FindPattern(GetModuleHandle(NULL), Configuration::ProcessEventPattern, Configuration::ProcessEventMask);
         }
-        else
+        else if (Configuration::ProcessEventIndex != -1)
         {
             processEventAddress = reinterpret_cast<uintptr_t*>(UObject::StaticClass()->VfTableObject.Dummy)[Configuration::ProcessEventIndex];
+        }
+        else
+        {
+            file << "\n\t// FIX PROCESS EVENT IN CONFIGURATION.CPP, INVALID INDEX";
+            Utils::Messagebox("Warning: Process event is not configured correctly in \"Configuration.cpp\", you set \"UsingOffsets\" to true yet you did not provide a valid index for process event!", "UE3SDKGenerator", MB_ICONWARNING | MB_OK);
         }
 
         if (processEventAddress != 0x0)
@@ -1828,8 +1833,8 @@ namespace FunctionGenerator
         }
         else
         {
-            file << "\n\t// FIX PROCESS EVENT IN CONFIGURATION.CPP";
-            Utils::Messagebox("Warning: Process event is not configured correctly in \"Configuration.cpp\"!", "UE3SDKGenerator", MB_ICONWARNING | MB_OK);
+            file << "\n\t// FIX PROCESS EVENT IN CONFIGURATION.CPP, INVALID ADDRESS";
+            Utils::Messagebox("Warning: Process event is not configured correctly in \"Configuration.cpp\", failed to find a valid address!", "UE3SDKGenerator", MB_ICONWARNING | MB_OK);
         }
     }
 
@@ -2918,29 +2923,37 @@ namespace Generator
 
         if (GlobalsInitialized)
         {
-            if (createLogFile)
+            if (Configuration::GeneratorDirectory.u8string() == "I_FORGOT_TO_SET_A_PATH")
             {
-                std::filesystem::path fullDirectory = Configuration::GeneratorDirectory / Configuration::GameNameShort;
-                std::filesystem::create_directory(Configuration::GeneratorDirectory);
-                std::filesystem::create_directory(fullDirectory);
-
-                if (std::filesystem::exists(fullDirectory))
+                if (createLogFile)
                 {
-                    LogFile.open(fullDirectory / "UE3SDKGenerator.log");
+                    std::filesystem::path fullDirectory = (Configuration::GeneratorDirectory / Configuration::GameNameShort);
+                    std::filesystem::create_directory(Configuration::GeneratorDirectory);
+                    std::filesystem::create_directory(fullDirectory);
 
-                    LogFile << "Entry Point: " << Printer::Hex(entryPoint, sizeof(entryPoint)) << "\n";
-                    LogFile << "GObjects: " << Printer::Hex(reinterpret_cast<uintptr_t>(GObjects), sizeof(GObjects)) << "\n";
-                    LogFile << "GNames: " << Printer::Hex(reinterpret_cast<uintptr_t>(GNames), sizeof(GNames)) << "\n";
-                    LogFile.flush();
+                    if (std::filesystem::exists(fullDirectory))
+                    {
+                        LogFile.open(fullDirectory / "UE3SDKGenerator.log");
+
+                        LogFile << "Entry Point: " << Printer::Hex(entryPoint, sizeof(entryPoint)) << "\n";
+                        LogFile << "GObjects: " << Printer::Hex(reinterpret_cast<uintptr_t>(GObjects), sizeof(GObjects)) << "\n";
+                        LogFile << "GNames: " << Printer::Hex(reinterpret_cast<uintptr_t>(GNames), sizeof(GNames)) << "\n";
+                        LogFile.flush();
+                    }
+                    else
+                    {
+                        Utils::Messagebox("Failed to create the log file, might not have the right permissions!", "UE3SDKGenerator", MB_ICONERROR | MB_OK);
+                        return false;
+                    }
                 }
-                else
-                {
-                    Utils::Messagebox("Failed to create the log file, might not have the right permissions!", "UE3SDKGenerator", MB_ICONERROR | MB_OK);
-                    return false;
-                }
+
+                return true;
             }
-            
-            return true;
+            else
+            {
+                Utils::Messagebox("Uh oh, looks like you forgot to set an output path for the generator! Please edit the \"GeneratorDirectory\" in \"Configuration.cpp\" and rebuild.", "UE3SDKGenerator", MB_ICONERROR | MB_OK);
+                return false;
+            }
         }
 
         return false;

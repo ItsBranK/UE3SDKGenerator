@@ -5,7 +5,7 @@
 
 namespace Utils
 {
-	void Messagebox(const std::string& message, const std::string& title, uint64_t flags);
+	void Messagebox(const std::string& message, const std::string& title, uint32_t flags);
 	MODULEINFO GetModuleInfo(LPCTSTR moduleName);
 	uintptr_t FindPattern(HMODULE module, const uint8_t* pattern, const char* mask);
 	bool MapExists(std::multimap<std::string, std::string>& map, const std::string& key, const std::string& value);

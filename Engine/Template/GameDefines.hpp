@@ -365,34 +365,22 @@ public:
 public:
 	ElementConstReference operator[](int32_t index) const
 	{
-		if (index <= ArrayCount)
-		{
-			return ArrayData[index];
-		}
+		return ArrayData[index];
 	}
 
 	ElementReference operator[](int32_t index)
 	{
-		if (index <= ArrayCount)
-		{
-			return ArrayData[index];
-		} 
+		return ArrayData[index];
 	}
 
 	ElementConstReference At(int32_t index) const
 	{
-		if (index <= ArrayCount)
-		{
-			return ArrayData[index];
-		} 
+		return ArrayData[index];
 	}
 
 	ElementReference At(int32_t index)
 	{
-		if (index <= ArrayCount)
-		{
-			return ArrayData[index];
-		} 
+		return ArrayData[index];
 	}
 
 	void Add(ElementConstReference newElement)
@@ -541,23 +529,17 @@ public:
 	~TMap() {}
 
 public:
-	ElementConstReference operator[](const int32_t index) const
+	ElementConstReference operator[](int32_t index) const
 	{
-		if (index <= ElementCount)
-		{
-			return ElementData[index];
-		}
+		return ElementData[index];
 	}
 
-	ElementReference operator[](const int32_t index)
+	ElementReference operator[](int32_t index)
 	{
-		if (index <= ElementCount)
-		{
-			return ElementData[index];
-		}
+		return ElementData[index];
 	}
 
-	const TValue& operator[](const TKey key) const
+	const TValue& operator[](const TKey& key) const
 	{
 		for (int32_t i = 0; i < Num(); i++)
 		{
@@ -570,7 +552,7 @@ public:
 		}
 	}
 
-	TValue& operator[](const TKey key)
+	TValue& operator[](const TKey& key)
 	{
 		for (int32_t i = 0; i < Num(); i++)
 		{
@@ -583,26 +565,20 @@ public:
 		}
 	}
 
-	TMap<TKey, TValue> operator=(const struct FMap_Mirror& fMap)
+	TMap<TKey, TValue>& operator=(const struct FMap_Mirror& fMap)
 	{
 		*this = *reinterpret_cast<TMap<TKey, TValue>*>(&fMap);
 		return *this;
 	}
 
-	ElementConstReference At(const int32_t index) const
+	ElementConstReference At(int32_t index) const
 	{
-		if (index <= ElementCount)
-		{
-			return ElementData[index];
-		}
+		return ElementData[index];
 	}
 
-	ElementReference At(const int32_t index)
+	ElementReference At(int32_t index)
 	{
-		if (index <= ElementCount)
-		{
-			return ElementData[index];
-		}
+		return ElementData[index];
 	}
 
 	int32_t Num() const
@@ -693,7 +669,7 @@ public:
 #endif
 
 public:
-	FNameEntry() {}
+	FNameEntry() : Flags(0), Index(-1) {}
 	~FNameEntry() {}
 
 public:
@@ -751,7 +727,7 @@ private:
 	int32_t			InstanceNumber;									// 0x0004 (0x04)
 
 public:
-	FName() : FNameEntryId(0), InstanceNumber(0) {}
+	FName() : FNameEntryId(-1), InstanceNumber(0) {}
 
 	FName(int32_t id) : FNameEntryId(id), InstanceNumber(0) {}
 
@@ -958,7 +934,7 @@ public:
 			return str;
 		}
 
-		return std::string("null");
+		return "null";
 	}
 #endif
 
@@ -970,7 +946,7 @@ public:
 			return std::string(ArrayData);
 		}
 
-		return std::string("null");
+		return "null";
 	}
 #endif
 
