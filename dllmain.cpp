@@ -2923,7 +2923,7 @@ namespace Generator
 
         if (GlobalsInitialized)
         {
-            if (Configuration::GeneratorDirectory.u8string() == "I_FORGOT_TO_SET_A_PATH")
+            if (Configuration::GeneratorDirectory.u8string() != "I_FORGOT_TO_SET_A_PATH")
             {
                 if (createLogFile)
                 {
