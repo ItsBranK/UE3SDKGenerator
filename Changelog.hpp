@@ -1,6 +1,10 @@
 #pragma once
 
 /*
+	Changes in v2.2.9:
+	- Added a new enum cache system, which auto-renames enums in the final generated sdk. This fixes enums sometimes being generated with the same name.
+	- Additional changes are just some code refracturing and optimization improvements.
+
 	Changes in v2.2.8:
 	- Added a special check before generating to make sure you set an output path in "Configuration.cpp", also added another check for the process event index.
 	- Improved/organized various classes and structs in "GameDefines.hpp", as well in "PiecesOfCode.cpp" to match this.
@@ -18,7 +22,7 @@
 	- Changed the "EClassTypes", "EFieldIds", "EPropertyTypes", enums so their values are assigned by the compiler instead; this is for easier modifying in the future if needed.
 	- Changed the constuctors for the "ClassField" class in "GameDefines.cpp", along with slightly modifying some of the members in the "Fields" namespace.
 	- Changed the commenting for "iNative".
-
+ 
 	Changes in v2.2.4:
 	- Added the "FinalAlignment" option in "Configuration.hpp/cpp", this lets you set a custom byte alignment for classes/structs in the final sdk.
 	- Added an option/comment in "Configuration.hpp" for the "EAlignment" enum.
@@ -80,7 +84,7 @@
 	- Added some safety/null checks for class fields.
 	- Changed the AreGObjectsValid check to support a wider range of games.
 	- You no longer need to comment out returning the offsetof in "GameDefines.cpp" for the class fields.
-
+ 
 	(This is a major update for the generator, please read the new information in the README file in the repository as well as the comments/examples in the "Template" folder!)
 	Changes in v2.1.5:
 	- Remade the "Template" engine classes to include all classes that are required for generation.
@@ -91,7 +95,7 @@
 	- Added the TMap class, along with printing it to "GameDefines.hpp" in the generated sdk.
 	- Moved the changelog from "dllmain.hpp" to this current file.
 	- Moved the GeneratorDirectory field from "Engine.hpp" to "Configuration.hpp" and also made it a std::filesystem::path instead of a string.
-	- Turned some structs into classes, like TIterator, TArray, and FString.
+	- Turned some structs into classes, like TIterator, TArray, and FString. 
 
 	Changes in v2.1.4:
 	- Fixed not correctly setting input values if the parameter was a bitfield.

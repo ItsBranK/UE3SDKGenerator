@@ -356,7 +356,7 @@ namespace PiecesOfCode
 	const std::string FNameEntry_UTF16 =
 		"\n"
 		"public:\n"
-		"\tFNameEntry() : Flags(0), Index(-1) {}\n"
+		"\tFNameEntry() : Index(-1) {}\n"
 		"\t~FNameEntry() {}\n\n"
 		"public:\n"
 		"\tint32_t GetIndex() const\n"
@@ -380,7 +380,7 @@ namespace PiecesOfCode
 	const std::string FNameEntry_UTF8 =
 		"\n"
 		"public:\n"
-		"\tFNameEntry() : Flags(0), Index(-1) {}\n"
+		"\tFNameEntry() : Index(-1) {}\n"
 		"\t~FNameEntry() {}\n\n"
 		"public:\n"
 		"\tint32_t GetIndex() const\n"

@@ -13,7 +13,7 @@
       <UniqueIdentifier>{c2909db8-7df0-479c-9864-696d3e87ee8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Template">
-      <UniqueIdentifier>{6a793848-84ba-4b9d-9ae7-d5c1f395fa99}</UniqueIdentifier>
+      <UniqueIdentifier>{1d65af18-016c-4ade-aef3-1e2d4a7383c0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,13 +29,13 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Template\Configuration.cpp">
-      <Filter>Engine\Template</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Template\GameDefines.cpp">
       <Filter>Engine\Template</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Template\PiecesOfCode.cpp">
+      <Filter>Engine\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Template\Configuration.cpp">
       <Filter>Engine\Template</Filter>
     </ClCompile>
   </ItemGroup>
