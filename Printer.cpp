@@ -8,22 +8,22 @@ namespace Printer
         stream.str(std::string());
     }
 
-    void FillRight(std::ostringstream& stream, const char& fill, uint64_t width)
+    void FillRight(std::ostringstream& stream, char fill, uint64_t width)
     {
         stream <<  std::setfill(fill) << std::setw(width) << std::right;
     }
 
-    void FillLeft(std::ostringstream& stream, const char& fill, uint64_t width)
+    void FillLeft(std::ostringstream& stream, char fill, uint64_t width)
     {
         stream <<  std::setfill(fill) << std::setw(width) << std::left;
     }
 
-    void FillRight(std::ofstream& stream, const char& fill, uint64_t width)
+    void FillRight(std::ofstream& stream, char fill, uint64_t width)
     {
         stream <<  std::setfill(fill) << std::setw(width) << std::right;
     }
 
-    void FillLeft(std::ofstream& stream, const char& fill, uint64_t width)
+    void FillLeft(std::ofstream& stream, char fill, uint64_t width)
     {
         stream <<  std::setfill(fill) << std::setw(width) << std::left;
     }

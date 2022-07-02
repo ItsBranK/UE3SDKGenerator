@@ -22,8 +22,8 @@ namespace Retrievers
 {
 	void GetAllPropertyFlags(std::ostringstream& stream, uint64_t propertyFlags);
 	void GetAllFunctionFlags(std::ostringstream& stream, uint64_t functionFlags);
-	EPropertyTypes GetPropertyType(class UProperty* property, std::string& propertyType, bool returnFunction);
-	size_t GetPropertySize(class UProperty* property);
+	EPropertyTypes GetPropertyType(class UProperty* uProperty, std::string& propertyType, bool returnFunction);
+	size_t GetPropertySize(class UProperty* uProperty);
 	uintptr_t GetEntryPoint();
 	uintptr_t GetOffset(uintptr_t address);
 }
@@ -36,12 +36,14 @@ namespace ConstGenerator
 
 namespace EnumGenerator
 {
+	extern std::unordered_map<std::string, std::vector<class UEnum*>> mEnums;
 	void GenerateEnum(std::ofstream& file, class UEnum* uEnum);
 	void ProcessEnums(std::ofstream& file, class UObject* packageObj);
 }
 
 namespace StructGenerator
 {
+	extern std::vector<std::string> vGeneratedStructs;
 	class UScriptStruct* FindLargestStruct(const std::string& structFullName);
 	void GenerateStructFields(std::ofstream& structStream, EClassTypes structType);
 	void GenerateStruct(std::ofstream& file, class UScriptStruct* scriptStruct);
@@ -51,6 +53,7 @@ namespace StructGenerator
 
 namespace ClassGenerator
 {
+	extern std::unordered_map<std::string, int32_t> mGeneratedClasses;
 	void GenerateClassFields(std::ostringstream& classStream, class UClass* uClass, EClassTypes classType);
 	void GenerateClass(std::ofstream& file, class UClass* uClass);
 	void GenerateClassProperties(std::ofstream& file, class UClass* uClass, class UObject* packageObj);
@@ -79,7 +82,7 @@ namespace Generator
 	extern std::vector<class UObject*> vIncludes;
 	extern std::vector<std::pair<std::string, int32_t>> vConstants;
 
-	std::string CreateValidName(const std::string& invalidName);
+	std::string CreateValidName(std::string name);
 	std::string CreateUniqueName(class UClass* uClass);
 	std::string CreateUniqueName(class UFunction* uFunction, class UClass* uClass);
 	std::string CreateIndexName(class UObject* uObject, bool pushBack);
