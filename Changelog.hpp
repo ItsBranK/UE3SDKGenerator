@@ -7,7 +7,7 @@
 	- Added a new option "RemoveNativeFlags" in "Configuration.cpp", this will determine  if you want to remove the "FUNC_Native" flag or not on functions.
 	- Added a new option "NO_LOGGING", if defined in the "Configuration.hpp" file a log file will not be generated.
 	- Added a new templated "IsA" function for UObject.
-	- BitField booleans now generate as bools instead of unsigned longs.
+	- Bit fields now generate as "uint32_t" instead of "unsigned long".
 	- Changed how "FinalAlignment" works in combination with "UsingEnumClasses", please read the new "Configuration.cpp" file for more info!
 	- Other changes are optimization and redundancy improvements.
 
