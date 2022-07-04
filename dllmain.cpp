@@ -1768,8 +1768,18 @@ namespace ParameterGenerator
                     if (uProperty)
                     {
                         std::string propertyType;
+                        EPropertyTypes returnPropertyType = EPropertyTypes::TYPE_UNKNOWN;
 
-                        if (Retrievers::GetPropertyTypeInternal(uProperty, propertyType, true, true) != EPropertyTypes::TYPE_UNKNOWN)
+                        if ((uProperty->PropertyFlags & EPropertyFlags::CPF_OutParm) || (uProperty->PropertyFlags & EPropertyFlags::CPF_ReturnParm))
+                        {
+                            returnPropertyType = Retrievers::GetPropertyType(uProperty, propertyType);
+                        }
+                        else
+                        {
+                            returnPropertyType = Retrievers::GetPropertyTypeInternal(uProperty, propertyType, true, true);
+                        }
+
+                        if (returnPropertyType != EPropertyTypes::TYPE_UNKNOWN)
                         {
                             std::string propertyName = Generator::CreateValidName(uProperty->GetName());
 
