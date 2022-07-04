@@ -336,21 +336,16 @@ std::string UObject::GetNameCPP()
 
 std::string UObject::GetFullName()
 {
-	if (this->Class && this->Outer)
+	std::string fullName = this->GetName();
+
+	for (UObject* uOuter = this->Outer; uOuter; uOuter = uOuter->Outer)
 	{
-		std::string fullName = this->GetName();
-
-		for (UObject* uOuter = this->Outer; uOuter; uOuter = uOuter->Outer)
-		{
-			fullName = uOuter->GetName() + "." + fullName;
-		}
-
-		fullName = this->Class->GetName() + " " + fullName;
-
-		return fullName;
+		fullName = uOuter->GetName() + "." + fullName;
 	}
 
-	return "null";
+	fullName = this->Class->GetName() + " " + fullName;
+
+	return fullName;
 }
 
 std::string UObject::GetPackageName()

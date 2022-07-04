@@ -11,6 +11,7 @@
 // Comment & uncomment these depending on what your game uses!
 #define CHARACTER_UTF16
 //#define CHARACTER_UTF8
+//#define NO_LOGGING // Uncomment if you want to disable logging to the log file.
 
 // This CAN be customized to anything you want really, just remember "FinalAlignment" only applies to the generated sdk.
 enum class EAlignment : int32_t
@@ -29,6 +30,7 @@ namespace Configuration
 	extern const bool UsingDetours;
 	extern const bool UsingEnumClasses;
 	extern const bool PrintFlagEnums;
+	extern const bool RemoveNativeFlags;
 	extern const std::string EnumClassType;
 
 	extern const int32_t CommentSpacer;

@@ -6,11 +6,10 @@
 namespace Utils
 {
 	void Messagebox(const std::string& message, const std::string& title, uint32_t flags);
-	MODULEINFO GetModuleInfo(LPCTSTR moduleName);
-	uintptr_t FindPattern(HMODULE module, const uint8_t* pattern, const char* mask);
+	uintptr_t FindPattern(HMODULE hModule, const uint8_t* pattern, const char* mask);
 	bool MapExists(std::multimap<std::string, std::string>& map, const std::string& key, const std::string& value);
-	bool SortPropertyPair(std::pair<class UProperty*, std::string> uPropertyA, std::pair<class UProperty*, std::string> uPropertyB);
 	bool SortProperty(class UProperty* uPropertyA, class UProperty* uPropertyB);
+	bool SortPropertyPair(const std::pair<class UProperty*, std::string>& pairA, const std::pair<class UProperty*, std::string>& pairB);
 	bool IsStructProperty(EPropertyTypes propertyType);
 	bool IsBitField(EPropertyTypes propertyType);
 	bool IsBitField(unsigned long dimension);
@@ -22,8 +21,9 @@ namespace Retrievers
 {
 	void GetAllPropertyFlags(std::ostringstream& stream, uint64_t propertyFlags);
 	void GetAllFunctionFlags(std::ostringstream& stream, uint64_t functionFlags);
-	EPropertyTypes GetPropertyType(class UProperty* uProperty, std::string& propertyType, bool returnFunction);
-	size_t GetPropertySize(class UProperty* uProperty);
+	EPropertyTypes GetPropertyTypeInternal(class UProperty* uProperty, std::string& outPropertyType, bool ignoreEnum, bool isBitField = false);
+	EPropertyTypes GetPropertyType(class UProperty* uProperty, std::string& outPropertyType, bool isBitField = false);
+	size_t GetPropertySize(class UProperty* uProperty, bool isBitField = true);
 	uintptr_t GetEntryPoint();
 	uintptr_t GetOffset(uintptr_t address);
 }
@@ -36,7 +36,9 @@ namespace ConstGenerator
 
 namespace EnumGenerator
 {
-	extern std::unordered_map<std::string, std::vector<class UEnum*>> mEnums;
+	extern std::unordered_map<std::string, std::vector<class UEnum*>> mEnumCache;
+	extern std::unordered_map<UEnum*, std::string> mGeneratedNames;
+	std::string GenerateEnumName(class UEnum* uEnum);
 	void GenerateEnum(std::ofstream& file, class UEnum* uEnum);
 	void ProcessEnums(std::ofstream& file, class UObject* packageObj);
 }
@@ -91,8 +93,10 @@ namespace Generator
 	void GenerateConstants();
 	void GenerateHeaders();
 	void GenerateDefines();
-	void ProcessPackages(std::filesystem::path directory);
+	void ProcessPackages(const std::filesystem::path& directory);
 	void GenerateSDK();
 	void DumpInstances(bool dumpNames, bool dumpObjects);
+	void DumpObjects();
+	void DumpNames();
 	bool Initialize(bool createLogFile);
 }

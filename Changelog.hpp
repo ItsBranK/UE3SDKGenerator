@@ -1,6 +1,16 @@
 #pragma once
 
 /*
+	Changes in v2.3.0
+	- Enums now generate with their actual enum names in class fields and functions instead of "uint8_t"! This option only works if you have "UsingEnumClasses" set to TRUE in "Configuration.cpp", just make sure you have the right "EnumClassType" set.
+	- Enums generated with "UsingEnumClasses" set to FALSE will now add the objects name in front of the property value, this is to prevent duplicate name errors.
+	- Added a new option "RemoveNativeFlags" in "Configuration.cpp", this will determine  if you want to remove the "FUNC_Native" flag or not on functions.
+	- Added a new option "NO_LOGGING", if defined in the "Configuration.hpp" file a log file will not be generated.
+	- Added a new templated "IsA" function for UObject.
+	- BitField booleans now generate as bools instead of unsigned longs.
+	- Changed how "FinalAlignment" works in combination with "UsingEnumClasses", please read the new "Configuration.cpp" file for more info!
+	- Other changes are optimization and redundancy improvements.
+
 	Changes in v2.2.9:
 	- Added a new enum cache system, which auto-renames enums in the final generated sdk. This fixes enums sometimes being generated with the same name.
 	- Additional changes are just some code refracturing and optimization improvements.

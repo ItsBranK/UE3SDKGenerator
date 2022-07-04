@@ -1110,6 +1110,13 @@ public:
 		return countCache[objectName];
 	}
 	static class UClass* FindClass(const std::string& classFullName);
+	template<typename T> bool IsA()
+	{
+		if (std::is_base_of<UObject, T>::value)
+		{
+			return IsA(T::StaticClass());
+		}
+	}
 	bool IsA(class UClass* uClass);
 	bool IsA(int32_t objInternalInteger);
 };
