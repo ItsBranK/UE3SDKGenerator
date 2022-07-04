@@ -958,7 +958,7 @@ namespace StructGenerator
 
                 std::string propertyType;
 
-                if (Retrievers::GetPropertyTypeInternal(uProperty, propertyType, true) != EPropertyTypes::TYPE_UNKNOWN)
+                if (Retrievers::GetPropertyTypeInternal(uProperty, propertyType, true, true) != EPropertyTypes::TYPE_UNKNOWN)
                 {
                     size_t correctElementSize = Retrievers::GetPropertySize(uProperty);
                     std::string propertyName = Generator::CreateValidName(uProperty->GetName());
@@ -1413,7 +1413,7 @@ namespace ClassGenerator
 
                     std::string propertyType;
 
-                    if (Retrievers::GetPropertyType(uProperty, propertyType) != EPropertyTypes::TYPE_UNKNOWN)
+                    if (Retrievers::GetPropertyTypeInternal(uProperty, propertyType, false, true) != EPropertyTypes::TYPE_UNKNOWN)
                     {
                         size_t correctElementSize = Retrievers::GetPropertySize(uProperty);
 
@@ -1769,7 +1769,7 @@ namespace ParameterGenerator
                     {
                         std::string propertyType;
 
-                        if (Retrievers::GetPropertyType(uProperty, propertyType) != EPropertyTypes::TYPE_UNKNOWN)
+                        if (Retrievers::GetPropertyTypeInternal(uProperty, propertyType, true, true) != EPropertyTypes::TYPE_UNKNOWN)
                         {
                             std::string propertyName = Generator::CreateValidName(uProperty->GetName());
 
