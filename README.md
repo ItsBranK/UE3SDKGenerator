@@ -6,7 +6,7 @@ A modern C++17 Unreal Engine 3 SDK generator, originally based off of TheFeckles
 
 ~~This project is not fully complete yet, if you encounter any bugs please create a new issue [here](https://github.com/ItsBranK/UE3SDKGenerator/issues).~~
 
-UPDATE: I will no longer be adding or improving any features, please do not create a new issue unless there is some big boy issue that really needs to get fixed. Treat this repository as half-archived. I plan on remaking/integrating this into a future project of mine I've been working on.
+UPDATE: I will no longer be adding or improving any features, please do not create a new issue unless there is some big boy issue that really needs to get fixed; treat this repository as half-archived. I plan on remaking/integrating this into a future project of mine which I've been working on for some time.
 
 ### Features
 
