@@ -2864,7 +2864,7 @@ namespace Generator
             if (std::filesystem::exists(fullDirectory))
             {
                 uintptr_t entryPoint = Retrievers::GetEntryPoint();
-                uintptr_t offset = (reinterpret_cast<uintptr_t>(GObjects) - entryPoint);
+                uintptr_t offset = (reinterpret_cast<uintptr_t>(GNames) - entryPoint);
 
                 std::ofstream file(fullDirectory / "NameDump.txt");
 
