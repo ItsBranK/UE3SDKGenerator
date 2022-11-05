@@ -4,7 +4,7 @@
 
 A modern C++17 Unreal Engine 3 SDK generator, originally based off of TheFeckless's UE3 SDK Generator.
 
-UPDATE: I will no longer be adding or improving any features, this project is now archived. I plan on remaking/integrating this into a future project of mine which I've been working on for some time.
+**This project is now deprecated and is no longer being maintained, this repository now only exists for archival purposes! For an updated and maintained version I have created a [separate project here](https://github.com/CodeRedModding/CodeRed-Generator/)!
 
 ### Features
 
